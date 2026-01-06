@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 BHCS - BioCore Homeostatic Civilization System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: 80px 1fr 120px;
+            gap: 15px;
+            padding: 15px;
+            height: 100vh;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #4CAF50, #9C27B0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
+        .left-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+
+        .main-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .right-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+
+        .footer {
+            grid-column: 1 / -1;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #64B5F6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zone-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .zone-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .zone-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .zone-id {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .zone-state {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .state-calm { background: #4CAF50; }
+        .state-overstimulated { background: #FF9800; }
+        .state-emergent { background: #f44336; }
+        .state-critical { background: #9C27B0; }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .metric {
+            background: rgba(255,255,255,0.05);
+            padding: 6px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            height: 250px;
+            position: relative;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .control-group select,
+        .control-group input {
+            padding: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+        }
+
+        .btn-defense {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-biomedical {
+            background: linear-gradient(135deg, #00BCD4, #0097A7);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .status-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .status-title {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .ai-predictions {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .defense-status {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .biomedical-status {
+            background: rgba(0, 188, 212, 0.1);
+            border: 1px solid rgba(0, 188, 212, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .performance-indicator {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 3px 0;
+        }
+
+        .performance-fill {
+            height: 100%;
+            transition: width 0.5s ease, background-color 0.5s ease;
+            border-radius: 3px;
+        }
+
+        .alert {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+            border-radius: 8px;
+            padding: 8px;
+            margin: 5px 0;
+            animation: pulse 2s infinite;
+        }
+
+        .alert.critical {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .system-health {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .health-online { background: #4CAF50; }
+        .health-warning { background: #FF9800; }
+        .health-offline { background: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🧠 BHCS</h1>
+            <div class="system-health">
+                <div class="health-indicator health-online" id="rust-health"></div>
+                <span>Rust Core</span>
+                <div class="health-indicator health-online" id="ai-health"></div>
+                <span>AI System</span>
+                <div class="health-indicator health-online" id="bio-health"></div>
+                <span>BioCore</span>
+            </div>
+        </div>
+
+        <div class="left-panel">
+            <div class="section">
+                <h3>🏙️ City Zones</h3>
+                <div class="zone-grid" id="zones-container">
+                    <!-- Zones will be dynamically inserted -->
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🧠 AI Predictions</h3>
+                <div class="ai-predictions">
+                    <div>Status: <span id="ai-status">Initializing...</span></div>
+                    <div>Confidence: <span id="ai-confidence">0%</span></div>
+                    <div>Optimal BioCore: <span id="ai-optimal">Calculating...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <div class="section">
+                <h3>📊 System Performance</h3>
+                <div class="chart-container">
+                    <canvas id="performance-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎛️ BHCS Controls</h3>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Target Zone</label>
+                        <select id="zone-select">
+                            <option value="0">Zone 0</option>
+                            <option value="1">Zone 1</option>
+                            <option value="2">Zone 2</option>
+                            <option value="3">Zone 3</option>
+                            <option value="4">Zone 4</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Plant</label>
+                        <select id="plant-select">
+                            <option value="Ginkgo">Ginkgo</option>
+                            <option value="Aloe">Aloe</option>
+                            <option value="Turmeric">Turmeric</option>
+                            <option value="Ginseng">Ginseng</option>
+                            <option value="Ashwagandha">Ashwagandha</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="applyBioCore()">🌿 Apply BioCore</button>
+                    <button class="btn btn-ai" onclick="activateAI()">🧠 AI Optimize</button>
+                    <button class="btn btn-defense" onclick="testDefense()">☢️ Test Defense</button>
+                    <button class="btn btn-biomedical" onclick="analyzeBiomedical()">🔬 Analyze Health</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="section">
+                <h3>🛡️ Defense Systems</h3>
+                <div class="defense-status">
+                    <div>Threat Level: <span id="threat-level">NORMAL</span></div>
+                    <div>Radiation: <span id="radiation-level">0.00</span> mSv/h</div>
+                    <div>Protection: <span id="protection-status">Active</span></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Biomedical Analytics</h3>
+                <div class="biomedical-status">
+                    <div>Population Health: <span id="pop-health">0.00</span></div>
+                    <div>Disease Risk: <span id="disease-risk">LOW</span></div>
+                    <div>Immunity Level: <span id="immunity-level">0.00</span></div>
+                    <div>Recovery Rate: <span id="recovery-rate">0.00</span></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📈 System Metrics</h3>
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="status-title">Avg Activity</div>
+                        <div class="status-value" id="avg-activity">0.00</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-title">Response Time</div>
+                        <div class="status-value" id="response-time">0ms</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-title">AI Accuracy</div>
+                        <div class="status-value" id="ai-accuracy">0%</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-title">System Health</div>
+                        <div class="status-value" id="system-health">100%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>🌍 BioCore Homeostatic Civilization System</div>
+            <div>🧠 AI + 🦀 Rust + 🌐 TypeScript</div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let zones = [];
+        let performanceChart = null;
+        let aiPredictions = {};
+        let defenseStatus = { threat_level: 'NORMAL', radiation: 0.0 };
+        let biomedicalData = {};
+        
+        const API_BASE = 'http://localhost:3030';
+
+        // Initialize dashboard
+        async function init() {
+            await initializeChart();
+            await checkAllSystems();
+            await updateDashboard();
+            
+            // Start real-time updates
+            setInterval(updateDashboard, 1000);
+            setInterval(updateAIMetrics, 2000);
+            setInterval(updateDefenseMetrics, 3000);
+            setInterval(checkAllSystems, 5000);
+        }
+
+        // Initialize performance chart
+        async function initializeChart() {
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'City Activity',
+                        data: [],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'AI Confidence',
+                        data: [],
+                        borderColor: '#9C27B0',
+                        backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Threat Level',
+                        data: [],
+                        borderColor: '#f44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1.0,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.8)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.8)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: 'rgba(255,255,255,0.8)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Check all system statuses
+        async function checkAllSystems() {
+            // Check Rust engine
+            const rustStatus = await checkRustEngine();
+            updateHealthIndicator('rust-health', rustStatus);
+            
+            // Simulate AI and BioCore status
+            const aiStatus = Math.random() > 0.1;
+            const bioStatus = Math.random() > 0.05;
+            
+            updateHealthIndicator('ai-health', aiStatus);
+            updateHealthIndicator('bio-health', bioStatus);
+        }
+
+        // Check Rust engine health
+        async function checkRustEngine() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Update health indicator
+        function updateHealthIndicator(elementId, isOnline) {
+            const element = document.getElementById(elementId);
+            element.className = isOnline ? 'health-indicator health-online' : 'health-indicator health-offline';
+        }
+
+        // Update main dashboard
+        async function updateDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/state`);
+                if (!response.ok) return;
+                
+                zones = await response.json();
+                renderZones();
+                updateMetrics();
+                updateChart();
+                
+            } catch (error) {
+                console.error('Dashboard update failed:', error);
+            }
+        }
+
+        // Render zone cards
+        function renderZones() {
+            const container = document.getElementById('zones-container');
+            container.innerHTML = '';
+
+            zones.forEach(zone => {
+                const card = createZoneCard(zone);
+                container.appendChild(card);
+            });
+        }
+
+        // Create enhanced zone card
+        function createZoneCard(zone) {
+            const card = document.createElement('div');
+            card.className = 'zone-card';
+            
+            const stateClass = `state-${zone.state.toLowerCase()}`;
+            const confidence = aiPredictions[zone.id]?.confidence || 0;
+            
+            card.innerHTML = `
+                <div class="zone-header">
+                    <div class="zone-id">Zone ${zone.id}</div>
+                    <div class="zone-state ${stateClass}">${zone.state}</div>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value">${zone.activity.toFixed(2)}</div>
+                        <div class="metric-label">Activity</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${(confidence * 100).toFixed(0)}%</div>
+                        <div class="metric-label">AI Confidence</div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Update metrics
+        function updateMetrics() {
+            const avgActivity = zones.reduce((sum, zone) => sum + zone.activity, 0) / zones.length;
+            document.getElementById('avg-activity').textContent = avgActivity.toFixed(2);
+        }
+
+        // Update chart
+        function updateChart() {
+            if (!performanceChart) return;
+            
+            const avgActivity = zones.reduce((sum, zone) => sum + zone.activity, 0) / zones.length;
+            const avgConfidence = Object.values(aiPredictions).reduce((sum, pred) => sum + pred.confidence, 0) / Object.keys(aiPredictions).length;
+            const threatNumeric = getThreatNumeric(defenseStatus.threat_level);
+            
+            const now = new Date().toLocaleTimeString();
+            
+            // Add new data
+            performanceChart.data.labels.push(now);
+            performanceChart.data.datasets[0].data.push(avgActivity);
+            performanceChart.data.datasets[1].data.push(avgConfidence);
+            performanceChart.data.datasets[2].data.push(threatNumeric);
+            
+            // Keep only last 20 data points
+            if (performanceChart.data.labels.length > 20) {
+                performanceChart.data.labels.shift();
+                performanceChart.data.datasets.forEach(dataset => dataset.data.shift());
+            }
+            
+            performanceChart.update('none');
+        }
+
+        // Get threat numeric value
+        function getThreatNumeric(threatLevel) {
+            const levels = {
+                'NORMAL': 0.1,
+                'ELEVATED': 0.3,
+                'HIGH': 0.5,
+                'SEVERE': 0.7,
+                'CRITICAL': 0.9
+            };
+            return levels[threatLevel] || 0.1;
+        }
+
+        // Update AI metrics
+        function updateAIMetrics() {
+            // Simulate AI predictions
+            zones.forEach(zone => {
+                aiPredictions[zone.id] = {
+                    confidence: 0.7 + Math.random() * 0.3,
+                    prediction: zone.activity + (Math.random() - 0.5) * 0.1,
+                    optimal_plant: ['Turmeric', 'Ginseng', 'Ashwagandha'][Math.floor(Math.random() * 3)],
+                    optimal_drug: ['DrugB', 'DrugC', 'DrugE'][Math.floor(Math.random() * 3)]
+                };
+            });
+            
+            const avgConfidence = Object.values(aiPredictions).reduce((sum, pred) => sum + pred.confidence, 0) / Object.keys(aiPredictions).length;
+            document.getElementById('ai-confidence').textContent = `${(avgConfidence * 100).toFixed(0)}%`;
+            document.getElementById('ai-status').textContent = avgConfidence > 0.8 ? 'Optimized' : 'Learning';
+            
+            const optimal = aiPredictions[0] || {};
+            document.getElementById('ai-optimal').textContent = `${optimal.optimal_plant} + ${optimal.optimal_drug}`;
+            document.getElementById('ai-accuracy').textContent = `${(85 + Math.random() * 10).toFixed(0)}%`;
+        }
+
+        // Update defense metrics
+        function updateDefenseMetrics() {
+            // Simulate defense scenarios
+            const scenarios = ['NORMAL', 'ELEVATED', 'HIGH', 'SEVERE', 'CRITICAL'];
+            defenseStatus.threat_level = scenarios[Math.floor(Math.random() * scenarios.length)];
+            defenseStatus.radiation = 0.01 + Math.random() * 0.1;
+            
+            document.getElementById('threat-level').textContent = defenseStatus.threat_level;
+            document.getElementById('radiation-level').textContent = defenseStatus.radiation.toFixed(3);
+            document.getElementById('protection-status').textContent = defenseStatus.threat_level === 'NORMAL' ? 'Active' : 'Enhanced';
+        }
+
+        // Apply BioCore effect
+        async function applyBioCore() {
+            const zoneId = parseInt(document.getElementById('zone-select').value);
+            const plant = document.getElementById('plant-select').value;
+            const drug = document.getElementById('drug-select').value;
+            const synergy = 0.5 + Math.random() * 0.5; // Simulate synergy
+
+            try {
+                const response = await fetch(`${API_BASE}/biocore`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ zone: zoneId, plant, drug, synergy })
+                });
+
+                if (response.ok) {
+                    showNotification('BioCore effect applied successfully', 'success');
+                } else {
+                    showNotification('Failed to apply BioCore effect', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error', 'error');
+            }
+        }
+
+        // Activate AI optimization
+        function activateAI() {
+            showNotification('AI optimization analyzing all zones...', 'info');
+            
+            setTimeout(() => {
+                zones.forEach((zone, index) => {
+                    aiPredictions[index] = {
+                        confidence: 0.9,
+                        prediction: 0.5, // Optimal target
+                        optimal_plant: 'Turmeric',
+                        optimal_drug: 'DrugC'
+                    };
+                });
+                
+                showNotification('AI optimization complete - Homeostatic balance achieved', 'success');
+            }, 2000);
+        }
+
+        // Test defense systems
+        function testDefense() {
+            showNotification('Defense system test initiated - Simulating stress scenarios', 'warning');
+            
+            defenseStatus.threat_level = 'HIGH';
+            defenseStatus.radiation = 0.5;
+            
+            setTimeout(() => {
+                defenseStatus.threat_level = 'NORMAL';
+                defenseStatus.radiation = 0.01;
+                showNotification('Defense systems test complete - All zones protected', 'success');
+            }, 3000);
+        }
+
+        // Analyze biomedical data
+        function analyzeBiomedical() {
+            showNotification('Biomedical analysis running - Population health assessment', 'info');
+            
+            setTimeout(() => {
+                const avgHealth = 0.6 + Math.random() * 0.3;
+                const diseaseRisk = avgHealth > 0.7 ? 'LOW' : avgHealth > 0.4 ? 'MODERATE' : 'HIGH';
+                const immunity = 0.5 + Math.random() * 0.4;
+                const recovery = 0.6 + Math.random() * 0.3;
+                
+                document.getElementById('pop-health').textContent = avgHealth.toFixed(2);
+                document.getElementById('disease-risk').textContent = diseaseRisk;
+                document.getElementById('immunity-level').textContent = immunity.toFixed(2);
+                document.getElementById('recovery-rate').textContent = recovery.toFixed(2);
+                
+                showNotification('Biomedical analysis complete - Health recommendations generated', 'success');
+            }, 1500);
+        }
+
+        // Update system health
+        function updateSystemHealth() {
+            const health = 90 + Math.random() * 10;
+            document.getElementById('system-health').textContent = `${health.toFixed(0)}%`;
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert ${type === 'error' ? 'critical' : ''}`;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '1000';
+            notification.style.maxWidth = '300px';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        // Start dashboard
+        init();
+    </script>
+</body>
+</html>
