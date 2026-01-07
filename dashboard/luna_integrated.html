@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHCS + LunaBeyond AI - Integrated Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4CAF50, #9C27B0, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: luna-glow 3s ease-in-out infinite;
+        }
+
+        .luna-status {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: rgba(156, 39, 176, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(156, 39, 176, 0.5);
+            font-size: 0.9rem;
+            animation: luna-pulse 2s ease-in-out infinite;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+        }
+
+        .panel h2 {
+            color: #64B5F6;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .luna-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #9C27B0;
+            animation: luna-sparkle 1.5s ease-in-out infinite;
+        }
+
+        /* BHCS System Styles */
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .zone-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .zone-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #4CAF50, #9C27B0, #2196F3);
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .zone-card:hover::before {
+            opacity: 0.3;
+        }
+
+        .zone-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .zone-id {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .zone-state {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .state-calm { background: #4CAF50; color: white; }
+        .state-overstimulated { background: #FF9800; color: white; }
+        .state-emergent { background: #f44336; color: white; }
+        .state-critical { background: #9C27B0; color: white; }
+
+        .zone-activity {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .activity-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .activity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        /* Luna AI Chat Styles */
+        .luna-chat {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            max-width: 85%;
+            animation: message-appear 0.3s ease;
+        }
+
+        @keyframes message-appear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.1));
+            margin-left: auto;
+            text-align: right;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .message.luna {
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.3), rgba(156, 39, 176, 0.1));
+            border: 1px solid rgba(156, 39, 176, 0.3);
+        }
+
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .luna-mood {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #9C27B0;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+        }
+
+        .chat-send {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        /* Control Panel Styles */
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .control-group select,
+        .control-group input {
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-group select option {
+            background: #1a1f3a;
+            color: white;
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #4CAF50, #45a049); color: white; }
+        .btn-secondary { background: linear-gradient(135deg, #9C27B0, #673AB7); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #f44336, #d32f2f); color: white; }
+
+        /* Metrics Styles */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .metric-change {
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+
+        /* Luna Insights Panel */
+        .luna-insights {
+            background: rgba(156, 39, 176, 0.1);
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .insight-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid #9C27B0;
+            animation: insight-appear 0.5s ease;
+        }
+
+        @keyframes insight-appear {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .insight-confidence {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* Luna Quick Actions */
+        .luna-quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .quick-action-btn {
+            padding: 8px 12px;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 6px;
+            background: rgba(156, 39, 176, 0.1);
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(156, 39, 176, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Luna Animations */
+        @keyframes luna-glow {
+            0% { box-shadow: 0 0 5px rgba(156, 39, 176, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(156, 39, 176, 0.8), 0 0 30px rgba(156, 39, 176, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(156, 39, 176, 0.5); }
+        }
+
+        @keyframes luna-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes luna-sparkle {
+            0% { opacity: 0; }
+            25% { opacity: 1; }
+            50% { opacity: 0; }
+            75% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .luna-status {
+                position: static;
+                margin-top: 10px;
+                display: inline-block;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>BHCS + LunaBeyond AI</h1>
+            <p>Integrated Homeostatic System with Conversational AI</p>
+            <div class="luna-status">
+                <span class="luna-indicator"></span>
+                🌙 Luna Active - Learning Mode: Continuous
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- BHCS System Panel -->
+            <div class="panel">
+                <h2>🧠 BHCS System</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">System Health</div>
+                        <div class="metric-value" id="systemHealth">20%</div>
+                        <div class="metric-change">+5% from last hour</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Avg Activity</div>
+                        <div class="metric-value" id="avgActivity">0.65</div>
+                        <div class="metric-change">-0.02 trend</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">AI Accuracy</div>
+                        <div class="metric-value" id="aiAccuracy">50%</div>
+                        <div class="metric-change">+2% improvement</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Risk Level</div>
+                        <div class="metric-value" id="riskLevel">Low</div>
+                        <div class="metric-change">Stable</div>
+                    </div>
+                </div>
+
+                <div class="zones-grid" id="zonesGrid">
+                    <!-- Zones will be populated here -->
+                </div>
+
+                <div class="control-panel">
+                    <div class="control-group">
+                        <label for="zoneSelect">Zone</label>
+                        <select id="zoneSelect">
+                            <option value="0">Zone 0</option>
+                            <option value="1">Zone 1</option>
+                            <option value="2">Zone 2</option>
+                            <option value="3">Zone 3</option>
+                            <option value="4">Zone 4</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="plantSelect">Plant</label>
+                        <select id="plantSelect">
+                            <option value="Ginkgo">🌿 Ginkgo</option>
+                            <option value="Aloe">🌱 Aloe</option>
+                            <option value="Turmeric">🌿 Turmeric</option>
+                            <option value="Ginseng">🌿 Ginseng</option>
+                            <option value="Ashwagandha">🌿 Ashwagandha</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="drugSelect">Drug</label>
+                        <select id="drugSelect">
+                            <option value="DrugA">💊 DrugA</option>
+                            <option value="DrugB">💊 DrugB</option>
+                            <option value="DrugC">💊 DrugC</option>
+                            <option value="DrugD">💊 DrugD</option>
+                            <option value="DrugE">💊 DrugE</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="synergySlider">Synergy: <span id="synergyValue">0.7</span></label>
+                        <input type="range" id="synergySlider" min="0.1" max="1.0" step="0.1" value="0.7">
+                    </div>
+                </div>
+
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="applyBiocore()">🌿 Apply BioCore</button>
+                    <button class="btn btn-secondary" onclick="optimizeSystem()">🧠 Optimize</button>
+                    <button class="btn btn-danger" onclick="resetSystem()">🔄 Reset</button>
+                </div>
+            </div>
+
+            <!-- Luna AI Panel -->
+            <div class="panel">
+                <h2>
+                    <span class="luna-indicator"></span>
+                    🌙 LunaBeyond AI
+                </h2>
+                
+                <div class="luna-chat">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message luna">
+                            <div class="message-sender">
+                                🌙 LunaBeyond
+                                <span class="luna-mood">😊 curious</span>
+                            </div>
+                            <div>Hello! I'm LunaBeyond, your AI companion. I'm monitoring the BHCS system and learning from its behavior. Ask me anything about the system or try the quick actions below!</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask Luna about the system..." onkeypress="handleKeyPress(event)">
+                        <button class="chat-send" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+
+                <div class="luna-insights">
+                    <h3 style="color: #9C27B0; margin-bottom: 10px; font-size: 1.1rem;">💡 Luna's Insights</h3>
+                    <div id="lunaInsights">
+                        <div class="insight-item">
+                            <div>🌟 System is currently stable with minor optimization opportunities.</div>
+                            <div class="insight-confidence">Confidence: 85%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="luna-quick-actions">
+                    <button class="quick-action-btn" onclick="sendCommand('/status')">📊 Status</button>
+                    <button class="quick-action-btn" onclick="sendCommand('/zones')">🧠 Zones</button>
+                    <button class="quick-action-btn" onclick="sendCommand('/predict')">🔮 Predict</button>
+                    <button class="quick-action-btn" onclick="sendCommand('/learn')">📚 Learn</button>
+                    <button class="quick-action-btn" onclick="sendCommand('/evolve')">🌙 Evolve</button>
+                    <button class="quick-action-btn" onclick="sendCommand('/recommend')">🎯 Recommend</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Integrated BHCS + Luna System
+        class IntegratedBHCSSystem {
+            constructor() {
+                this.zones = [
+                    { id: 0, activity: 0.8, state: "OVERSTIMULATED" },
+                    { id: 1, activity: 0.6, state: "OVERSTIMULATED" },
+                    { id: 2, activity: 0.3, state: "CALM" },
+                    { id: 3, activity: 0.7, state: "OVERSTIMULATED" },
+                    { id: 4, activity: 0.5, state: "CALM" }
+                ];
+                
+                this.lunaPersonality = {
+                    mood: 'curious',
+                    expertise: 'evolving',
+                    confidence: 0.5,
+                    interactions: 0
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateDisplay();
+                this.startSystemSimulation();
+                this.startLunaLearning();
+            }
+
+            setupEventListeners() {
+                document.getElementById('synergySlider').addEventListener('input', (e) => {
+                    document.getElementById('synergyValue').textContent = e.target.value;
+                });
+            }
+
+            updateDisplay() {
+                // Update zones
+                const zonesGrid = document.getElementById('zonesGrid');
+                zonesGrid.innerHTML = '';
+
+                this.zones.forEach(zone => {
+                    const zoneCard = document.createElement('div');
+                    zoneCard.className = 'zone-card';
+                    zoneCard.innerHTML = `
+                        <div class="zone-id">Zone ${zone.id}</div>
+                        <div class="zone-state state-${zone.state.toLowerCase()}">${zone.state}</div>
+                        <div class="zone-activity">${zone.activity.toFixed(3)}</div>
+                        <div class="activity-bar">
+                            <div class="activity-fill" style="width: ${zone.activity * 100}%"></div>
+                        </div>
+                    `;
+                    zonesGrid.appendChild(zoneCard);
+                });
+
+                // Update metrics
+                const systemHealth = this.calculateSystemHealth();
+                document.getElementById('systemHealth').textContent = `${(systemHealth * 100).toFixed(0)}%`;
+                document.getElementById('avgActivity').textContent = this.calculateAvgActivity().toFixed(3);
+                
+                const riskLevel = this.calculateRiskLevel();
+                document.getElementById('riskLevel').textContent = riskLevel;
+                
+                // Update AI accuracy based on interactions
+                const aiAccuracy = Math.min(0.95, 0.5 + (this.lunaPersonality.interactions * 0.01));
+                document.getElementById('aiAccuracy').textContent = `${(aiAccuracy * 100).toFixed(0)}%`;
+                
+                // Update Luna status
+                this.updateLunaStatus();
+            }
+
+            updateLunaStatus() {
+                const statusElement = document.querySelector('.luna-status');
+                const moodEmojis = {
+                    'curious': '🤔',
+                    'confident': '😊',
+                    'excited': '🤩',
+                    'helpful': '💫'
+                };
+                
+                const moodEmoji = moodEmojis[this.lunaPersonality.mood] || '🌙';
+                statusElement.innerHTML = `
+                    <span class="luna-indicator"></span>
+                    ${moodEmoji} Luna Active - Mood: ${this.lunaPersonality.mood} - Expertise: ${this.lunaPersonality.expertise}
+                `;
+            }
+
+            calculateSystemHealth() {
+                const calmZones = this.zones.filter(z => z.state === "CALM").length;
+                return calmZones / this.zones.length;
+            }
+
+            calculateAvgActivity() {
+                return this.zones.reduce((sum, zone) => sum + zone.activity, 0) / this.zones.length;
+            }
+
+            calculateRiskLevel() {
+                const avgActivity = this.calculateAvgActivity();
+                if (avgActivity > 0.8) return "High";
+                if (avgActivity > 0.6) return "Medium";
+                return "Low";
+            }
+
+            startSystemSimulation() {
+                setInterval(() => {
+                    this.zones.forEach(zone => {
+                        const change = (Math.random() - 0.5) * 0.02;
+                        zone.activity = Math.max(0.0, Math.min(1.0, zone.activity + change));
+                        zone.state = this.determineState(zone.activity);
+                    });
+
+                    this.updateDisplay();
+                }, 2000);
+            }
+
+            startLunaLearning() {
+                setInterval(() => {
+                    this.lunaPersonality.confidence = Math.min(0.95, this.lunaPersonality.confidence + 0.001);
+                    
+                    // Generate insights
+                    if (Math.random() < 0.3) {
+                        this.generateLunaInsight();
+                    }
+                }, 5000);
+            }
+
+            generateLunaInsight() {
+                const insights = [
+                    "🌟 System harmony is improving with current interventions.",
+                    "⚡ Zone 2 shows excellent recovery patterns.",
+                    "🎯 Optimization opportunity detected in Zone 0.",
+                    "📊 System health trending upward over last hour.",
+                    "🧠 Neural networks adapting to system patterns."
+                ];
+                
+                const insight = insights[Math.floor(Math.random() * insights.length)];
+                const confidence = (this.lunaPersonality.confidence * 100).toFixed(0);
+                
+                const insightsContainer = document.getElementById('lunaInsights');
+                const insightElement = document.createElement('div');
+                insightElement.className = 'insight-item';
+                insightElement.innerHTML = `
+                    <div>${insight}</div>
+                    <div class="insight-confidence">Confidence: ${confidence}%</div>
+                `;
+                
+                insightsContainer.insertBefore(insightElement, insightsContainer.firstChild);
+                
+                // Keep only last 3 insights
+                while (insightsContainer.children.length > 3) {
+                    insightsContainer.removeChild(insightsContainer.lastChild);
+                }
+            }
+
+            updateLunaMood(message) {
+                const lowerMessage = message.toLowerCase();
+                
+                if (lowerMessage.includes('beautiful') || lowerMessage.includes('amazing') || lowerMessage.includes('awesome') || lowerMessage.includes('love') || lowerMessage.includes('excellent') || lowerMessage.includes('perfect')) {
+                    this.lunaPersonality.mood = 'excited';
+                } else if (lowerMessage.includes('help') || lowerMessage.includes('how') || lowerMessage.includes('what') || lowerMessage.includes('why') || lowerMessage.includes('question')) {
+                    this.lunaPersonality.mood = 'helpful';
+                } else if (lowerMessage.includes('great') || lowerMessage.includes('good') || lowerMessage.includes('fantastic')) {
+                    this.lunaPersonality.mood = 'confident';
+                } else if (lowerMessage.includes('curious') || lowerMessage.includes('wonder') || lowerMessage.includes('interesting') || lowerMessage.includes('fascinating')) {
+                    this.lunaPersonality.mood = 'curious';
+                }
+                
+                // Update expertise based on interactions
+                if (this.lunaPersonality.interactions > 20) {
+                    this.lunaPersonality.expertise = 'highly_evolved';
+                } else if (this.lunaPersonality.interactions > 10) {
+                    this.lunaPersonality.expertise = 'advanced';
+                } else if (this.lunaPersonality.interactions > 5) {
+                    this.lunaPersonality.expertise = 'knowledgeable';
+                }
+            }
+
+            determineState(activity) {
+                if (activity < 0.4) return "CALM";
+                if (activity < 0.7) return "OVERSTIMULATED";
+                if (activity < 0.9) return "EMERGENT";
+                return "CRITICAL";
+            }
+
+            applyBiocore() {
+                const zoneId = parseInt(document.getElementById('zoneSelect').value);
+                const plant = document.getElementById('plantSelect').value;
+                const drug = document.getElementById('drugSelect').value;
+                const synergy = parseFloat(document.getElementById('synergySlider').value);
+
+                const zone = this.zones[zoneId];
+                zone.activity = Math.max(0.0, Math.min(1.0, zone.activity - 0.2));
+                zone.state = this.determineState(zone.activity);
+
+                this.updateDisplay();
+                this.addChatMessage(`Applied ${plant} + ${drug} to Zone ${zoneId}`, 'user');
+                
+                // Luna response
+                setTimeout(() => {
+                    const response = `🌿 BioCore intervention applied! Zone ${zoneId} is now ${zone.state} with activity ${zone.activity.toFixed(3)}. The system health is now ${(this.calculateSystemHealth() * 100).toFixed(0)}%.`;
+                    this.addChatMessage(response, 'luna');
+                }, 500);
+            }
+
+            optimizeSystem() {
+                this.zones.forEach(zone => {
+                    zone.activity = 0.5 + (Math.random() - 0.5) * 0.1;
+                    zone.state = this.determineState(zone.activity);
+                });
+
+                this.updateDisplay();
+                this.addChatMessage('System optimization initiated', 'user');
+                
+                setTimeout(() => {
+                    const response = `🧠 System optimized! All zones are now balanced around the optimal activity level. System health: ${(this.calculateSystemHealth() * 100).toFixed(0)}%`;
+                    this.addChatMessage(response, 'luna');
+                }, 500);
+            }
+
+            resetSystem() {
+                this.zones = [
+                    { id: 0, activity: 0.8, state: "OVERSTIMULATED" },
+                    { id: 1, activity: 0.6, state: "OVERSTIMULATED" },
+                    { id: 2, activity: 0.3, state: "CALM" },
+                    { id: 3, activity: 0.7, state: "OVERSTIMULATED" },
+                    { id: 4, activity: 0.5, state: "CALM" }
+                ];
+                
+                this.updateDisplay();
+                this.addChatMessage('System reset', 'user');
+                
+                setTimeout(() => {
+                    this.addChatMessage('🔄 System reset to initial state. All zones restored.', 'luna');
+                }, 500);
+            }
+
+            addChatMessage(message, sender) {
+                const chatMessages = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const moodEmoji = {
+                    'curious': '🤔',
+                    'confident': '😊',
+                    'excited': '🤩',
+                    'helpful': '💫'
+                }.get(this.lunaPersonality.mood, '🌙');
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">
+                        ${sender === 'user' ? '👤 You' : `🌙 LunaBeyond <span class="luna-mood">${moodEmoji} ${this.lunaPersonality.mood}</span>`}
+                    </div>
+                    <div>${message}</div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            async sendChatMessage(message) {
+                this.lunaPersonality.interactions++;
+                this.addChatMessage(message, 'user');
+                
+                // Luna responds immediately (offline mode)
+                const response = this.generateLunaResponse(message);
+                this.addChatMessage(response, 'luna');
+                
+                // Update Luna's mood based on interaction
+                this.updateLunaMood(message);
+                
+                this.updateDisplay();
+                
+                // Generate insight after response
+                setTimeout(() => {
+                    this.generateLunaInsight();
+                }, 1000);
+            }
+
+            generateLunaResponse(message) {
+                const responses = {
+                    'status': `📊 Current system health is ${(this.calculateSystemHealth() * 100).toFixed(0)}% with ${this.calculateAvgActivity().toFixed(3)} average activity.`,
+                    'zones': `🧠 All zones are currently: ${this.zones.map(z => `${z.id}(${z.state})`).join(', ')}`,
+                    'ai': `🤖 I'm currently at confidence level ${(this.lunaPersonality.confidence * 100).toFixed(0)}% with ${this.lunaPersonality.interactions} interactions learned.`,
+                    'predict': `🔮 I predict the system health will reach ${(Math.min(1.0, this.calculateSystemHealth() + 0.2) * 100).toFixed(0)}% in the next hour.`,
+                    'learn': `📚 I'm continuously learning! My confidence is now ${(this.lunaPersonality.confidence * 100).toFixed(0)}% and I've had ${this.lunaPersonality.interactions} interactions.`,
+                    'evolve': `🌙 I'm evolving! My expertise level is ${this.lunaPersonality.expertise} and my confidence is improving with each interaction.`,
+                    'recommend': `🎯 I recommend focusing on ${this.zones.filter(z => z.state !== 'CALM')[0]?.id || 'all zones'} for optimal system balance.`
+                };
+
+                const lowerMessage = message.toLowerCase();
+                
+                for (const [key, value] of Object.entries(responses)) {
+                    if (lowerMessage.includes(key)) {
+                        return value;
+                    }
+                }
+
+                // Default responses
+                if (message.includes('?')) {
+                    return `🤔 That's an interesting question! Based on my analysis, the system is currently ${(this.calculateSystemHealth() * 100).toFixed(0)}% healthy. Would you like me to elaborate on any specific aspect?`;
+                } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                    return `🌙 Hello! I'm LunaBeyond, your AI companion. I'm monitoring the BHCS system with ${(this.lunaPersonality.confidence * 100).toFixed(0)}% confidence. What would you like to explore?`;
+                } else if (lowerMessage.includes('thank')) {
+                    return `😊 You're welcome! I enjoy learning and helping with the system. Every interaction makes me smarter and more confident!`;
+                } else {
+                    return `🧠 I'm processing that thought! I'm currently focused on monitoring ${(this.calculateSystemHealth() * 100).toFixed(0)}% system health across ${this.zones.length} zones. My confidence is ${(this.lunaPersonality.confidence * 100).toFixed(0)}%. Ask me anything!`;
+                }
+            }
+        }
+
+        // Initialize integrated system
+        const system = new IntegratedBHCSSystem();
+
+        // Global functions
+        function applyBiocore() {
+            system.applyBiocore();
+        }
+
+        function optimizeSystem() {
+            system.optimizeSystem();
+        }
+
+        function resetSystem() {
+            system.resetSystem();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                system.sendChatMessage(message);
+                input.value = '';
+            }
+        }
+
+        function sendCommand(command) {
+            system.sendChatMessage(command);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
