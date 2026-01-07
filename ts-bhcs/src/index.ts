@@ -75,7 +75,7 @@ class BHCSApplication {
             await this.engine.update();
             
             // 2. Process BioCore simulations
-            await this.biocore.update();
+            await this.biocore.update([]);
             
             // 3. Update controller state
             await this.controller.update();
