@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦀 LunaBeyond AI - Professional Real-Time Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #34495e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 10px;
+            background: rgba(46, 204, 113, 0.2);
+            border: 2px solid rgba(46, 204, 113, 0.5);
+            color: #ffffff;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .luna-chat-section {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: rgba(46, 204, 113, 0.1);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .luna-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            animation: message-slide 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes message-slide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+
+        .luna-message {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+        }
+
+        .message-sender {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .message-content {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #ffffff;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(46, 204, 113, 0.2);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-bottom-left-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+            animation: typing-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes typing-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffffff;
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: rgba(46, 204, 113, 0.6);
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
+        }
+
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .zone-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .zone-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .zone-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zone-icon {
+            font-size: 1.5rem;
+        }
+
+        .zone-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .metric-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .metric-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-button {
+            padding: 18px 25px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+        }
+
+        .button-icon {
+            font-size: 1.2rem;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .welcome-message h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .welcome-message p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .luna-chat-section, .info-section {
+                flex: 1;
+            }
+            
+            .zones-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦀 LunaBeyond AI - Professional Real-Time Dashboard</h1>
+        <div class="connection-status">
+            🟢 System Online
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="luna-chat-section">
+            <div class="chat-header">
+                <h2>
+                    <div class="luna-avatar">🦀</div>
+                    LunaBeyond AI Assistant
+                </h2>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h3>🦀 Welcome to Your Professional Dashboard</h3>
+                    <p>I'm LunaBeyond AI, your professional assistant for the Homeostatic City BioCore system! I'm connected to the system and ready to help optimize our city with real-time data and zone monitoring.</p>
+                    <p>Ask me about city conditions, BioCore effects, or system optimization!</p>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Ask Luna about city optimization, BioCore effects, or system insights...">
+                <button class="send-button" id="sendButton">
+                    Send Message
+                </button>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <div class="panel">
+                <h3>
+                    <div class="panel-icon">🏙️</div>
+                    City Zones Status
+                </h3>
+                <div class="zones-grid" id="zonesGrid">
+                    <div class="zone-card">
+                        <div class="zone-name">
+                            <span class="zone-icon">🏙️</span>
+                            Downtown
+                        </div>
+                        <div class="zone-metrics">
+                            <div class="metric-row">
+                                <div class="metric-label">Activity</div>
+                                <div class="metric-value">0.65</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Stress</div>
+                                <div class="metric-value">0.35</div>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 65%; background: linear-gradient(90deg, #3498db, #2980b9);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="zone-card">
+                        <div class="zone-name">
+                            <span class="zone-icon">🏭</span>
+                            Industrial
+                        </div>
+                        <div class="zone-metrics">
+                            <div class="metric-row">
+                                <div class="metric-label">Activity</div>
+                                <div class="metric-value">0.78</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Stress</div>
+                                <div class="metric-value">0.62</div>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 78%; background: linear-gradient(90deg, #e74c3c, #c0392b);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="zone-card">
+                        <div class="zone-name">
+                            <span class="zone-icon">🏘️</span>
+                            Residential
+                        </div>
+                        <div class="zone-metrics">
+                            <div class="metric-row">
+                                <div class="metric-label">Activity</div>
+                                <div class="metric-value">0.42</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Stress</div>
+                                <div class="metric-value">0.25</div>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 42%; background: linear-gradient(90deg, #f39c12, #e67e22);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="zone-card">
+                        <div class="zone-name">
+                            <span class="zone-icon">🏪</span>
+                            Commercial
+                        </div>
+                        <div class="zone-metrics">
+                            <div class="metric-row">
+                                <div class="metric-label">Activity</div>
+                                <div class="metric-value">0.71</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Stress</div>
+                                <div class="metric-value">0.38</div>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 71%; background: linear-gradient(90deg, #3498db, #2980b9);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="zone-card">
+                        <div class="zone-name">
+                            <span class="zone-icon">🌳</span>
+                            Parks
+                        </div>
+                        <div class="zone-metrics">
+                            <div class="metric-row">
+                                <div class="metric-label">Activity</div>
+                                <div class="metric-value">0.28</div>
+                            </div>
+                            <div class="metric-row">
+                                <div class="metric-label">Stress</div>
+                                <div class="metric-value">0.15</div>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 28%; background: linear-gradient(90deg, #2ecc71, #27ae60);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>
+                    <div class="panel-icon">📊</div>
+                    System Status
+                </h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Luna Status</div>
+                        <div class="status-value" id="lunaStatus">Active</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Interactions</div>
+                        <div class="status-value" id="lunaInteractions">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">System Health</div>
+                        <div class="status-value" id="systemHealth">Excellent</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">API Response</div>
+                        <div class="status-value" id="apiResponse">Fast</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>
+                    <div class="panel-icon">🌿</div>
+                    BioCore Controls
+                </h3>
+                <div class="action-buttons">
+                    <button class="action-button" onclick="askLuna('How is the city doing today?')">
+                        <span class="button-icon">🏙️</span>
+                        City Status
+                    </button>
+                    <button class="action-button" onclick="askLuna('What BioCore effects do you recommend?')">
+                        <span class="button-icon">🌿</span>
+                        BioCore Insights
+                    </button>
+                    <button class="action-button" onclick="askLuna('Optimize the entire system now!')">
+                        <span class="button-icon">🚀</span>
+                        System Optimization
+                    </button>
+                    <button class="action-button" onclick="askLuna('Apply calming effects to Industrial zone')">
+                        <span class="button-icon">😌</span>
+                        Apply Calming Effects
+                    </button>
+                    <button class="action-button" onclick="askLuna('Analyze all zones and provide LunaBeyond assistance')">
+                        <span class="button-icon">🌙</span>
+                        LunaBeyond Zone Analysis
+                    </button>
+                    <button class="action-button" onclick="askLuna('Show detailed zone information and recommendations')">
+                        <span class="button-icon">📊</span>
+                        Detailed Zone Info
+                    </button>
+                    <button class="action-button" onclick="askLuna('Apply BioCore effects to all zones simultaneously')">
+                        <span class="button-icon">🌿</span>
+                        All Zones BioCore
+                    </button>
+                    <button class="action-button" onclick="askLuna('Provide LunaBeyond strategic recommendations for city optimization')">
+                        <span class="button-icon">🧠</span>
+                        Strategic Recommendations
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Professional Luna Chat Application
+        class ProfessionalLunaApp {
+            constructor() {
+                this.lunaStatus = document.getElementById('lunaStatus');
+                this.lunaInteractions = document.getElementById('lunaInteractions');
+                this.systemHealth = document.getElementById('systemHealth');
+                this.apiResponse = document.getElementById('apiResponse');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                
+                this.interactionCount = 0;
+                this.zoneData = {
+                    downtown: { activity: 0.65, stress: 0.35 },
+                    industrial: { activity: 0.78, stress: 0.62 },
+                    residential: { activity: 0.42, stress: 0.25 },
+                    commercial: { activity: 0.71, stress: 0.38 },
+                    parks: { activity: 0.28, stress: 0.15 }
+                };
+                
+                this.initializeProfessionalLuna();
+                this.startZoneUpdates();
+            }
+            
+            initializeProfessionalLuna() {
+                // Simulate Luna connection
+                setTimeout(() => {
+                    this.updateStatus('🟢 Luna is Ready', 'active');
+                    this.interactionCount = 1;
+                    this.lunaInteractions.textContent = '1';
+                    this.addLunaMessage('🦀 Hello! I\'m LunaBeyond AI, your professional assistant for the Homeostatic City BioCore system! I\'m monitoring all 5 city zones in real-time and ready to provide BioCore recommendations. The current system shows balanced activity across most zones with the Industrial area showing slightly elevated stress levels. How can I help you optimize our city today?', 'luna');
+                }, 1500);
+            }
+            
+            askLuna(message) {
+                this.updateStatus('🟡 Luna is thinking...', 'thinking');
+                this.showTypingIndicator();
+                
+                // Simulate Luna processing
+                setTimeout(() => {
+                    const response = this.generateProfessionalLunaResponse(message);
+                    this.hideTypingIndicator();
+                    this.addLunaMessage(message, 'user');
+                    this.addLunaMessage(response, 'luna');
+                    this.interactionCount++;
+                    this.lunaInteractions.textContent = this.interactionCount;
+                    this.updateStatus('🟢 Luna is Ready', 'active');
+                    this.updateMetrics();
+                }, 2000 + Math.random() * 1000);
+            }
+            
+            generateProfessionalLunaResponse(message) {
+                const responses = {
+                    'hello': `🦀 Hello! I'm LunaBeyond AI, your professional assistant for the Homeostatic City BioCore system! I've had ${this.interactionCount} conversations and I'm continuously learning from our interactions. Current system analysis shows: Downtown (Activity: ${this.zoneData.downtown.activity.toFixed(2)}, Stress: ${this.zoneData.downtown.stress.toFixed(2)}), Industrial (Activity: ${this.zoneData.industrial.activity.toFixed(2)}, Stress: ${this.zoneData.industrial.stress.toFixed(2)}), Residential (Activity: ${this.zoneData.residential.activity.toFixed(2)}, Stress: ${this.zoneData.residential.stress.toFixed(2)}), Commercial (Activity: ${this.zoneData.commercial.activity.toFixed(2)}, Stress: ${this.zoneData.commercial.stress.toFixed(2)}), Parks (Activity: ${this.zoneData.parks.activity.toFixed(2)}, Stress: ${this.zoneData.parks.stress.toFixed(2)}). Based on this analysis, I recommend applying calming BioCore effects to the Industrial zone to reduce stress levels. How can I assist you further?`,
+                    'how': `🦀 I'm analyzing the real-time data from all 5 city zones. Current metrics show: Downtown (Activity: ${this.zoneData.downtown.activity.toFixed(2)}, Stress: ${this.zoneData.downtown.stress.toFixed(2)}), Industrial (Activity: ${this.zoneData.industrial.activity.toFixed(2)}, Stress: ${this.zoneData.industrial.stress.toFixed(2)}), Residential (Activity: ${this.zoneData.residential.activity.toFixed(2)}, Stress: ${this.zoneData.residential.stress.toFixed(2)}), Commercial (Activity: ${this.zoneData.commercial.activity.toFixed(2)}, Stress: ${this.zoneData.commercial.stress.toFixed(2)}), Parks (Activity: ${this.zoneData.parks.activity.toFixed(2)}, Stress: ${this.zoneData.parks.stress.toFixed(2)}). The Industrial zone requires immediate attention due to high stress levels (${this.zoneData.industrial.stress.toFixed(2)}). I recommend applying Ashwagandha+DrugA (calming synergy: 0.8) to reduce stress. What specific zone would you like me to focus on?`,
+                    'biocore': `🌿 Based on ${this.interactionCount} interactions and current zone analysis, I recommend: 1) Apply Ashwagandha+DrugA (calming synergy: 0.8) to Industrial zone for stress reduction (current stress: ${this.zoneData.industrial.stress.toFixed(2)}), 2) Use Ginseng+DrugC (activating synergy: 0.7) in Parks zone for gentle activation (current activity: ${this.zoneData.parks.activity.toFixed(2)}), 3) Maintain current BioCore settings for Downtown and Residential zones, 4) Monitor Commercial zone for optimal intervention timing. This approach should reduce overall city stress by 15% and improve homeostatic balance. Would you like me to implement these recommendations?`,
+                    'optimize': `🚀 I can optimize the entire system based on ${this.interactionCount} data points collected! Analysis shows Industrial zone needs immediate stress reduction (${this.zoneData.industrial.stress.toFixed(2)}), Parks zone could benefit from activation (${this.zoneData.parks.activity.toFixed(2)}), while other zones are within optimal parameters. I recommend: 1) Apply calming BioCore to Industrial zone, 2) Gentle activation to Parks zone, 3) Maintain current settings for balanced zones, 4) Implement predictive monitoring for Commercial zone. This should improve overall city homeostasis by ${18 + this.interactionCount}% based on my evolving intelligence. Shall I proceed with the optimization?`,
+                    'help': `🦀 I'm your professional assistant for the Homeostatic City BioCore system! After ${this.interactionCount} conversations, I've developed deep understanding of our city's patterns. I can: 1) Monitor all 5 zones with real-time metrics, 2) Analyze zone activity and stress levels, 3) Generate BioCore recommendations based on ${this.interactionCount} data points, 4) Provide system optimization strategies, 5) Explain plant-drug synergies and their effects on urban environments. Current system shows ${this.interactionCount > 10 ? 'excellent' : 'good'} zone balance with Industrial zone at ${this.zoneData.industrial.activity.toFixed(2)} activity and ${this.zoneData.industrial.stress.toFixed(2)} stress. What would you like to explore next?`,
+                    'thanks': `🦀 You're welcome! I'm continuously learning from our ${this.interactionCount} interactions to provide better recommendations. The current system shows ${this.interactionCount > 15 ? 'outstanding' : 'excellent'} zone balance with Industrial zone at ${this.zoneData.industrial.activity.toFixed(2)} activity and ${this.zoneData.industrial.stress.toFixed(2)} stress. My BioCore recommendations have helped reduce overall city stress by ${Math.min(25, this.interactionCount * 2)}% since our last conversation. My intelligence has evolved significantly through our ${this.interactionCount} interactions. What would you like to explore next?`,
+                    'evolve': `🌙 I'm evolving! After ${this.interactionCount} interactions, my intelligence level has advanced to ${this.getEvolutionLevel()}. I now understand complex city patterns and can provide ${this.interactionCount > 20 ? 'advanced' : 'intermediate'}-level recommendations. My BioCore synergy calculations have improved by ${Math.min(30, this.interactionCount)}% accuracy. Current zone analysis shows: Industrial (${this.zoneData.industrial.activity.toFixed(2)}, ${this.zoneData.industrial.stress.toFixed(2)}), Downtown (${this.zoneData.downtown.activity.toFixed(2)}, ${this.zoneData.downtown.stress.toFixed(2)}), Residential (${this.zoneData.residential.activity.toFixed(2)}, ${this.zoneData.residential.stress.toFixed(2)}), Commercial (${this.zoneData.commercial.activity.toFixed(2)}, ${this.zoneData.commercial.stress.toFixed(2)}), Parks (${this.zoneData.parks.activity.toFixed(2)}, ${this.zoneData.parks.stress.toFixed(2)}). I'm ready for ${this.interactionCount > 25 ? 'expert-level' : 'advanced-level'} system optimization!`,
+                    'analyze': `🌙 LunaBeyond Zone Analysis Complete! After analyzing all 5 zones, here's my comprehensive assessment:
+
+🏙️ **ZONE STATUS REPORT:**
+• **Downtown Zone**: Activity ${this.zoneData.downtown.activity.toFixed(2)}, Stress ${this.zoneData.downtown.stress.toFixed(2)} - Status: ${this.zoneData.downtown.stress < 0.4 ? 'OPTIMAL' : 'MONITOR'}
+• **Industrial Zone**: Activity ${this.zoneData.industrial.activity.toFixed(2)}, Stress ${this.zoneData.industrial.stress.toFixed(2)} - Status: ${this.zoneData.industrial.stress > 0.5 ? 'CRITICAL' : 'ATTENTION'}
+• **Residential Zone**: Activity ${this.zoneData.residential.activity.toFixed(2)}, Stress ${this.zoneData.residential.stress.toFixed(2)} - Status: ${this.zoneData.residential.stress < 0.3 ? 'BALANCED' : 'MONITOR'}
+• **Commercial Zone**: Activity ${this.zoneData.commercial.activity.toFixed(2)}, Stress ${this.zoneData.commercial.stress.toFixed(2)} - Status: ${this.zoneData.commercial.activity > 0.6 ? 'ACTIVE' : 'STABLE'}
+• **Parks Zone**: Activity ${this.zoneData.parks.activity.toFixed(2)}, Stress ${this.zoneData.parks.stress.toFixed(2)} - Status: ${this.zoneData.parks.stress < 0.2 ? 'EXCELLENT' : 'GOOD'}
+
+🌿 **BIOCORE RECOMMENDATIONS:**
+• **Industrial Zone**: Apply Ashwagandha+DrugA (calming synergy: 0.85) immediately
+• **Parks Zone**: Use Ginseng+DrugC (activating synergy: 0.75) for gentle stimulation
+• **Downtown Zone**: Maintain current BioCore settings
+• **Residential Zone**: Monitor for optimal intervention timing
+• **Commercial Zone**: Implement predictive BioCore management
+
+🚀 **LUNABEYOND ASSISTANCE:**
+I'm providing comprehensive zone analysis with ${this.interactionCount} interactions of learning. My intelligence level is ${this.getEvolutionLevel()} and I can offer ${this.interactionCount > 15 ? 'advanced' : 'professional'} recommendations for each zone based on real-time data patterns.
+
+Would you like me to implement these BioCore interventions or provide detailed analysis for any specific zone?`,
+                    'detailed': `🌙 Detailed Zone Information & LunaBeyond Analysis:
+
+📊 **COMPREHENSIVE ZONE DATA:**
+
+🏙️ **DOWNTOWN ZONE:**
+• Current Activity: ${this.zoneData.downtown.activity.toFixed(2)} (Target: 0.6-0.8)
+• Stress Level: ${this.zoneData.downtown.stress.toFixed(2)} (Optimal: <0.3)
+• Population Density: High
+• Primary Functions: Business, Commerce, Entertainment
+• BioCore Status: ${this.zoneData.downtown.stress < 0.3 ? 'OPTIMAL' : 'NEEDS ATTENTION'}
+
+🏭️ **INDUSTRIAL ZONE:**
+• Current Activity: ${this.zoneData.industrial.activity.toFixed(2)} (Target: 0.4-0.7)
+• Stress Level: ${this.zoneData.industrial.stress.toFixed(2)} (Critical: >0.5)
+• Pollution Index: Moderate-High
+• Primary Functions: Manufacturing, Logistics, Production
+• BioCore Status: ${this.zoneData.industrial.stress > 0.5 ? 'CRITICAL' : 'REQUIRES INTERVENTION'}
+
+🏘️ **RESIDENTIAL ZONE:**
+• Current Activity: ${this.zoneData.residential.activity.toFixed(2)} (Target: 0.3-0.5)
+• Stress Level: ${this.zoneData.residential.stress.toFixed(2)} (Optimal: <0.3)
+• Population Density: Medium
+• Primary Functions: Housing, Community Services
+• BioCore Status: ${this.zoneData.residential.stress < 0.3 ? 'EXCELLENT' : 'MONITOR'}
+
+🏪️ **COMMERCIAL ZONE:**
+• Current Activity: ${this.zoneData.commercial.activity.toFixed(2)} (Target: 0.6-0.8)
+• Stress Level: ${this.zoneData.commercial.stress.toFixed(2)} (Moderate: 0.3-0.5)
+• Economic Index: High
+• Primary Functions: Retail, Services, Offices
+• BioCore Status: ${this.zoneData.commercial.stress < 0.4 ? 'GOOD' : 'NEEDS OPTIMIZATION'}
+
+🌳️ **PARKS ZONE:**
+• Current Activity: ${this.zoneData.parks.activity.toFixed(2)} (Target: 0.2-0.4)
+• Stress Level: ${this.zoneData.parks.stress.toFixed(2)} (Excellent: <0.2)
+• Green Space Ratio: High
+• Primary Functions: Recreation, Relaxation, Nature
+• BioCore Status: ${this.zoneData.parks.stress < 0.2 ? 'PERFECT' : 'GOOD'}
+
+🌿 **LUNABEYOND BIOCORE STRATEGY:**
+Based on ${this.interactionCount} interactions of analysis, I recommend:
+
+1. **IMMEDIATE ACTIONS:**
+   • Apply Ashwagandha+DrugA to Industrial zone (calming synergy: 0.85)
+   • Use Ginseng+DrugC in Parks zone (activating synergy: 0.75)
+   • Maintain current BioCore in Downtown and Residential
+
+2. **MONITORING PRIORITIES:**
+   • Industrial zone stress reduction (critical priority)
+   • Commercial zone activity optimization
+   • Residential zone balance maintenance
+   • Parks zone gentle activation
+
+3. **PREDICTIVE MEASURES:**
+   • Implement stress forecasting for Industrial zone
+   • Set up activity optimization for Commercial zone
+   • Prepare seasonal BioCore adjustments
+   • Monitor cross-zone interactions
+
+🚀 **SYSTEM OPTIMIZATION:**
+With my ${this.getEvolutionLevel()} intelligence level, I can optimize the entire city system by ${15 + this.interactionCount}% through strategic BioCore applications and real-time monitoring.
+
+Would you like me to proceed with these optimizations or focus on any specific zone?`,
+                    'allzones': `🌙 ALL ZONES BIOCORE APPLICATION - LunaBeyond System Optimization:
+
+🚀 **INITIATING COMPREHENSIVE ZONE OPTIMIZATION:**
+
+📊 **CURRENT SYSTEM STATUS:**
+• Total Interactions: ${this.interactionCount}
+• Intelligence Level: ${this.getEvolutionLevel()}
+• System Health: ${this.interactionCount > 10 ? 'OPTIMAL' : 'EXCELLENT'}
+• Zones Monitored: 5 (Downtown, Industrial, Residential, Commercial, Parks)
+
+🌿 **SIMULTANEOUS BIOCORE APPLICATIONS:**
+
+🏙️ **DOWNTOWN ZONE:**
+• Status: ${this.zoneData.downtown.stress < 0.3 ? 'OPTIMAL' : 'MONITOR'}
+• Action: Maintain current BioCore settings
+• Effect: Stability and balance preservation
+
+🏭️ **INDUSTRIAL ZONE:**
+• Status: ${this.zoneData.industrial.stress > 0.5 ? 'CRITICAL' : 'REQUIRES INTERVENTION'}
+• Action: Apply Ashwagandha+DrugA (calming synergy: 0.85)
+• Effect: Immediate stress reduction, improved worker productivity
+
+🏘️ **RESIDENTIAL ZONE:**
+• Status: ${this.zoneData.residential.stress < 0.3 ? 'EXCELLENT' : 'MONITOR'}
+• Action: Apply Basil+DrugD (balancing synergy: 0.65)
+• Effect: Enhanced homeostatic balance, community well-being
+
+🏪️ **COMMERCIAL ZONE:**
+• Status: ${this.zoneData.commercial.stress < 0.4 ? 'GOOD' : 'NEEDS OPTIMIZATION'}
+• Action: Apply Turmeric+DrugB (purification synergy: 0.90)
+• Effect: Air quality improvement, customer satisfaction
+
+🌳️ **PARKS ZONE:**
+• Status: ${this.zoneData.parks.stress < 0.2 ? 'PERFECT' : 'GOOD'}
+• Action: Apply Lavender+DrugE (relaxing synergy: 0.80)
+• Effect: Enhanced relaxation, visitor experience
+
+📈 **EXPECTED OUTCOMES:**
+• Overall city stress reduction: ${20 + this.interactionCount}%
+• Homeostatic balance improvement: ${15 + this.interactionCount}%
+• System efficiency gain: ${10 + this.interactionCount}%
+• BioCore synergy optimization: ${25 + this.interactionCount}%
+
+🌙 **LUNABEYOND INTELLIGENCE:**
+With ${this.interactionCount} interactions and ${this.getEvolutionLevel()} intelligence level, I've successfully applied comprehensive BioCore optimizations to all zones. The system is now operating at ${this.interactionCount > 15 ? 'peak efficiency' : 'optimal performance'}.
+
+All zones are now balanced and optimized according to real-time data analysis and ${this.interactionCount} data points of learning. The city homeostatic system is functioning at maximum efficiency!
+
+Would you like me to continue monitoring and provide ongoing optimization recommendations?`
+                };
+                
+                return responses[message] || responses['help'];
+            }
+            
+            getEvolutionLevel() {
+                if (this.interactionCount < 5) return 'beginner';
+                if (this.interactionCount < 10) return 'intermediate';
+                if (this.interactionCount < 20) return 'advanced';
+                if (this.interactionCount < 30) return 'expert';
+                return 'master';
+            }
+            
+            addLunaMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const time = new Date().toLocaleTimeString();
+                const senderName = sender === 'luna' ? '🦀 Luna' : '👤 You';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${senderName}</div>
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">${time}</div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            showTypingIndicator() {
+                this.typingIndicator.classList.add('active');
+            }
+            
+            hideTypingIndicator() {
+                this.typingIndicator.classList.remove('active');
+            }
+            
+            updateStatus(status, type) {
+                this.lunaStatus.textContent = status;
+                this.lunaStatus.className = `status-${type}`;
+            }
+            
+            updateMetrics() {
+                // Update professional metrics
+                this.systemHealth.textContent = this.interactionCount > 5 ? 'Optimal' : 'Excellent';
+                this.apiResponse.textContent = this.interactionCount > 10 ? 'Ultra Fast' : 'Fast';
+            }
+            
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            
+            startZoneUpdates() {
+                // Update zone data periodically
+                setInterval(() => {
+                    this.updateZoneDisplay();
+                }, 5000); // Update every 5 seconds
+            }
+            
+            updateZoneDisplay() {
+                // Simulate real-time zone updates
+                Object.keys(this.zoneData).forEach(zone => {
+                    const data = this.zoneData[zone];
+                    
+                    // Add some randomness to simulate real-time changes
+                    data.activity = Math.max(0.1, Math.min(1.0, data.activity + (Math.random() - 0.5) * 0.1));
+                    data.stress = Math.max(0.1, Math.min(1.0, data.stress + (Math.random() - 0.5) * 0.1));
+                    
+                    this.zoneData[zone] = data;
+                });
+                
+                // Update the display
+                this.renderZones();
+            }
+            
+            renderZones() {
+                const zonesGrid = document.getElementById('zonesGrid');
+                if (!zonesGrid) return;
+                
+                const zoneCards = zonesGrid.querySelectorAll('.zone-card');
+                zoneCards.forEach((card, index) => {
+                    const zoneName = Object.keys(this.zoneData)[index];
+                    const data = this.zoneData[zoneName];
+                    
+                    if (zoneName && data) {
+                        const activityValue = card.querySelector('.zone-card:nth-child(' + (index + 1) + ') .metric-value');
+                        const stressValue = card.querySelector('.zone-card:nth-child(' + (index + 1) + ') .metric-row:nth-child(2) .metric-value');
+                        const activityBar = card.querySelector('.metric-fill');
+                        
+                        if (activityValue) activityValue.textContent = data.activity.toFixed(2);
+                        if (stressValue) stressValue.textContent = data.stress.toFixed(2);
+                        if (activityBar) {
+                            const activityPercent = Math.min(100, data.activity * 100);
+                            activityBar.style.width = activityPercent + '%';
+                            
+                            // Color based on activity level
+                            if (activityPercent > 70) {
+                                activityBar.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+                            } else if (activityPercent > 40) {
+                                activityBar.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
+                            } else {
+                                activityBar.style.background = 'linear-gradient(90deg, #2ecc71, #27ae60)';
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Initialize professional app
+        const app = new ProfessionalLunaApp();
+        
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = app.messageInput.value.trim();
+            if (message) {
+                app.askLuna(message);
+                app.messageInput.value = '';
+            }
+        });
+        
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = app.messageInput.value.trim();
+                if (message) {
+                    app.askLuna(message);
+                    app.messageInput.value = '';
+                }
+            }
+        });
+        
+        // Auto-connect to professional Luna
+        setTimeout(() => {
+            app.initializeProfessionalLuna();
+        }, 1000);
+    </script>
+</body>
+</html>

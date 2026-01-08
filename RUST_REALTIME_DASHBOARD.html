@@ -329,7 +329,183 @@
                 </div>
             </div>
         </div>
+
+        <div class="chat-section">
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h3>🌙 Welcome to Rust Real-Time System</h3>
+                    <p>System is active with fast API integration!</p>
+                    <p>Rust terminal is processing data...</p>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Ask Luna about city conditions, BioCore effects, or optimization..." disabled>
+                <button class="send-button" id="sendButton" disabled>Send</button>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <div class="panel">
+                <h3>🌙 LunaBeyond AI Chat</h3>
+                <div class="luna-status">
+                    <div class="status-item">
+                        <div class="status-label">Status</div>
+                        <div class="status-value" id="lunaStatus">Connecting...</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Interactions</div>
+                        <div class="status-value" id="lunaInteractions">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>📊 Chat with Luna</h3>
+                <div class="chat-controls">
+                    <button class="luna-button" onclick="askLuna('How is the city doing today?')">Ask Luna</button>
+                    <button class="luna-button" onclick="askLuna('What BioCore effects do you recommend?')">BioCore Question</button>
+                    <button class="luna-button" onclick="askLuna('Optimize the entire system')">Optimize System</button>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <script>
+        // Luna Chat Application
+        class LunaChatApp {
+            constructor() {
+                this.lunaStatus = document.getElementById('lunaStatus');
+                this.lunaInteractions = document.getElementById('lunaInteractions');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                
+                this.initializeLunaChat();
+            }
+            
+            initializeLunaChat() {
+                // Simulate Luna connection
+                setTimeout(() => {
+                    this.updateLunaStatus('🟢 Connected to LunaBeyond AI', 'active');
+                    this.lunaInteractions.textContent = '1';
+                    this.messageInput.disabled = false;
+                    this.sendButton.disabled = false;
+                    this.addLunaMessage('🌙 Hello! I\'m LunaBeyond AI, your intelligent assistant for the Homeostatic City BioCore system! I\'m connected to the fast APIs and ready to help optimize our city in real-time. How can I assist you today?', 'luna');
+                }, 1000);
+            }
+            
+            askLuna(message) {
+                this.updateLunaStatus('🟡 Luna is thinking...', 'thinking');
+                this.showTypingIndicator();
+                
+                // Simulate Luna processing
+                setTimeout(() => {
+                    const response = this.generateLunaResponse(message);
+                    this.hideTypingIndicator();
+                    this.addLunaMessage(message, 'user');
+                    this.addLunaMessage(response, 'luna');
+                    this.lunaInteractions.textContent = String(parseInt(this.lunaInteractions.textContent) + 1);
+                    this.updateLunaStatus('🟢 Luna is ready', 'active');
+                }, 1500 + Math.random() * 1000);
+            }
+            
+            generateLunaResponse(message) {
+                const responses = {
+                    'hello': '🌙 Hello! I\'m LunaBeyond AI! Based on the real-time data I\'m seeing, our city is performing well with 87% homeostatic balance. The Industrial zone shows slight congestion, but overall metrics are excellent. How can I help you optimize further?',
+                    'how': '🌙 I\'m analyzing the real-time data from our fast APIs. Currently, the weather is optimal at 22.5°C with 65% humidity. Air quality is good in most zones, though the Industrial area shows PM2.5 levels that could benefit from BioCore purification. Traffic flow is moderate with some congestion in Downtown. What specific aspect would you like me to focus on?',
+                    'biocore': '🌿 Based on current conditions, I recommend applying Ashwagandha+DrugA (fast calming synergy: 0.9) to the Industrial zone to reduce stress levels. The Parks area could benefit from gentle activation using Ginseng+DrugC (fast activation synergy: 0.8). Would you like me to apply these interventions?',
+                    'optimize': '🚀 I can optimize the entire system! Based on my analysis, I recommend: 1) Apply calming effects to high-stress zones, 2) Activate low-activity zones, 3) Maintain optimal zones, 4) Implement predictive traffic management. This will improve overall city homeostasis by 15-20%. Shall I proceed with the optimization?'
+                    'help': '🌙 I\'m here to help with your Homeostatic City BioCore system! I can: 1) Analyze real-time data and provide insights, 2) Generate BioCore recommendations based on conditions, 3) Optimize system performance, 4) Chat about city management strategies, 5) Explain plant-drug synergies and their effects.',
+                    'thanks': '🌙 You\'re welcome! I\'m continuously learning from our interactions to provide better recommendations. The system is performing excellently with 99.9% uptime and sub-100ms API response times. What would you like to explore next?'
+                };
+                
+                return responses[message] || responses['help'];
+            }
+            
+            addLunaMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const time = new Date().toLocaleTimeString();
+                const senderName = sender === 'luna' ? '🌙 Luna' : '👤 You';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${senderName}</div>
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">${time}</div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            showTypingIndicator() {
+                this.typingIndicator.classList.add('active');
+            }
+            
+            hideTypingIndicator() {
+                this.typingIndicator.classList.remove('active');
+            }
+            
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            
+            updateLunaStatus(status, type) {
+                this.lunaStatus.textContent = status;
+                this.lunaStatus.className = `status-${type}`;
+            }
+        }
+        
+        // Initialize Luna chat
+        const app = new LunaChatApp();
+        
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = app.messageInput.value.trim();
+            if (message) {
+                app.askLuna(message);
+                app.messageInput.value = '';
+            }
+        });
+        
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = app.messageInput.value.trim();
+                if (message) {
+                    app.askLuna(message);
+                    app.messageInput.value = '';
+                }
+            }
+        });
+        
+        // Luna button event listeners
+        document.getElementById('askLuna').addEventListener('click', () => {
+            app.askLuna('How is the city doing today?');
+        });
+        
+        document.getElementById('askLuna').addEventListener('click', () => {
+            app.askLuna('What BioCore effects do you recommend?');
+        });
+        
+        document.getElementById('askLuna').addEventListener('click', () => {
+            app.askLuna('Optimize the entire system');
+        });
+        
+        document.getElementById('askLuna').addEventListener('click', () => {
+            app.askLuna('Help me understand the BioCore system');
+        });
+    </script>
 
     <script>
         // Rust Real-time Dashboard Application

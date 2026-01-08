@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 LunaBeyond AI - Beautiful Real-Time Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+            margin-bottom: 10px;
+            animation: gradient-shift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            backdrop-filter: blur(10px);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.8); }
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .luna-chat-section {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .luna-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            animation: message-slide 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 20px;
+            z-index: -1;
+        }
+
+        @keyframes message-slide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .luna-message {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 4px 20px rgba(240, 147, 251, 0.3);
+        }
+
+        .message-sender {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .message-content {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #ffffff;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2));
+            padding: 15px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+            animation: typing-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes typing-pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffffff;
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-button {
+            padding: 18px 25px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border: none;
+            border-radius: 15px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .button-icon {
+            font-size: 1.2rem;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-message h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .welcome-message p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .luna-chat-section, .info-section {
+                flex: 1;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌙 LunaBeyond AI - Beautiful Real-Time Dashboard</h1>
+        <div class="connection-status">
+            🟢 Connected to LunaBeyond AI
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="luna-chat-section">
+            <div class="chat-header">
+                <h2>
+                    <div class="luna-avatar">🌙</div>
+                    LunaBeyond AI Assistant
+                </h2>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h3>🌙 Welcome to Your Beautiful Dashboard!</h3>
+                    <p>I'm LunaBeyond AI, your intelligent assistant for the Homeostatic City BioCore system! I'm connected to fast APIs and ready to help optimize our city in real-time with beautiful visualizations.</p>
+                    <p>Ask me anything about city conditions, BioCore effects, or system optimization!</p>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Ask Luna about city optimization, BioCore effects, or system insights...">
+                <button class="send-button" id="sendButton">
+                    Send Message
+                </button>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <div class="panel">
+                <h3>
+                    <div class="panel-icon">📊</div>
+                    System Status
+                </h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-label">Luna Status</div>
+                        <div class="status-value" id="lunaStatus">Active</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Interactions</div>
+                        <div class="status-value" id="lunaInteractions">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">API Speed</div>
+                        <div class="status-value" id="apiSpeed">Fast</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">System Health</div>
+                        <div class="status-value" id="systemHealth">Excellent</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>
+                    <div class="panel-icon">🌿</div>
+                    BioCore Controls
+                </h3>
+                <div class="action-buttons">
+                    <button class="action-button" onclick="askLuna('How is the city doing today?')">
+                        <span class="button-icon">🏙️</span>
+                        City Status
+                    </button>
+                    <button class="action-button" onclick="askLuna('What BioCore effects do you recommend?')">
+                        <span class="button-icon">🌿</span>
+                        BioCore Insights
+                    </button>
+                    <button class="action-button" onclick="askLuna('Optimize the entire system!')">
+                        <span class="button-icon">🚀</span>
+                        System Optimization
+                    </button>
+                    <button class="action-button" onclick="askLuna('Help me understand the BioCore system')">
+                        <span class="button-icon">💡</span>
+                        Learning & Help
+                    </button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>
+                    <div class="panel-icon">🔮</div>
+                    Quick Actions
+                </h3>
+                <div class="action-buttons">
+                    <button class="action-button" onclick="applyBioCore('calming')">
+                        <span class="button-icon">😌</span>
+                        Apply Calming Effects
+                    </button>
+                    <button class="action-button" onclick="applyBioCore('activating')">
+                        <span class="button-icon">⚡</span>
+                        Apply Activating Effects
+                    </button>
+                    <button class="action-button" onclick="applyBioCore('balancing')">
+                        <span class="button-icon">⚖️</span>
+                        Apply Balancing Effects
+                    </button>
+                    <button class="action-button" onclick="refreshSystem()">
+                        <span class="button-icon">🔄</span>
+                        Refresh System Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Beautiful Luna Chat Application
+        class BeautifulLunaApp {
+            constructor() {
+                this.lunaStatus = document.getElementById('lunaStatus');
+                this.lunaInteractions = document.getElementById('lunaInteractions');
+                this.apiSpeed = document.getElementById('apiSpeed');
+                this.systemHealth = document.getElementById('systemHealth');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                
+                this.interactionCount = 0;
+                this.initializeBeautifulLuna();
+            }
+            
+            initializeBeautifulLuna() {
+                // Simulate Luna connection with beautiful animations
+                setTimeout(() => {
+                    this.updateStatus('🟢 Luna is Ready', 'active');
+                    this.interactionCount = 1;
+                    this.lunaInteractions.textContent = '1';
+                    this.addLunaMessage('🌙 Hello! I\'m LunaBeyond AI, your beautiful intelligent assistant! I\'m connected to fast APIs and ready to help optimize our city with stunning visualizations and real-time insights. How can I assist you today?', 'luna');
+                    this.updateMetrics();
+                }, 1500);
+            }
+            
+            askLuna(message) {
+                this.updateStatus('🟡 Luna is thinking...', 'thinking');
+                this.showTypingIndicator();
+                
+                // Simulate beautiful Luna processing
+                setTimeout(() => {
+                    const response = this.generateBeautifulLunaResponse(message);
+                    this.hideTypingIndicator();
+                    this.addLunaMessage(message, 'user');
+                    this.addLunaMessage(response, 'luna');
+                    this.interactionCount++;
+                    this.lunaInteractions.textContent = this.interactionCount;
+                    this.updateStatus('🟢 Luna is Ready', 'active');
+                    this.updateMetrics();
+                }, 2000 + Math.random() * 1000);
+            }
+            
+            generateBeautifulLunaResponse(message) {
+                const responses = {
+                    'hello': '🌙 Hello! I\'m LunaBeyond AI, your beautiful intelligent assistant! Based on the real-time data I\'m seeing, our city is performing wonderfully with 92% homeostatic balance. The colorful visualizations show optimal conditions across all zones. The Industrial area has a beautiful gradient of orange to yellow indicating moderate activity that\'s within normal parameters. How can I help you make our city even more beautiful today?',
+                    'how': '🌙 I\'m analyzing the beautiful real-time data from our fast APIs! The weather shows a stunning gradient of blue to purple with optimal temperature at 21.5°C and 68% humidity. Air quality displays beautiful green indicators across most zones, though the Industrial area shows a gentle orange hue suggesting PM2.5 levels that could benefit from BioCore purification. The traffic flow creates beautiful patterns of movement with only slight congestion in Downtown. What beautiful aspect would you like me to focus on?',
+                    'biocore': '🌿 Based on the beautiful current conditions, I recommend applying a stunning combination of Ashwagandha+DrugA (fast calming synergy: 0.9) to the Industrial zone to create a beautiful gradient of calming blue. The Parks area could benefit from gentle activation using Ginseng+DrugC (fast activation synergy: 0.8) to create beautiful vibrant patterns of activity. Would you like me to apply these beautiful interventions?',
+                    'optimize': '🚀 I can optimize the entire system with beautiful visualizations! Based on my analysis, I recommend: 1) Apply calming effects to create beautiful gradients of blue in high-stress zones, 2) Activate low-activity zones with beautiful vibrant patterns, 3) Maintain optimal zones with beautiful balanced colors, 4) Implement predictive traffic management with beautiful flow patterns. This will improve overall city homeostasis by 18-25% and create stunning visual feedback! Shall I proceed with this beautiful optimization?',
+                    'help': '🌙 I\'m here to help with your beautiful Homeostatic City BioCore system! I can: 1) Analyze real-time data and provide beautiful insights, 2) Generate BioCore recommendations with stunning visual feedback, 3) Optimize system performance with beautiful gradients, 4) Chat about city management strategies with colorful visualizations, 5) Explain plant-drug synergies and their beautiful effects on our city.',
+                    'thanks': '🌙 You\'re welcome! I\'m continuously learning from our beautiful interactions to provide better recommendations with stunning visualizations. The system is performing excellently with 99.9% uptime and sub-100ms API response times, creating beautiful real-time updates. The colorful gradients show perfect homeostatic balance across all zones. What beautiful aspect would you like to explore next?'
+                };
+                
+                return responses[message] || responses['help'];
+            }
+            
+            addLunaMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const time = new Date().toLocaleTimeString();
+                const senderName = sender === 'luna' ? '🌙 Luna' : '👤 You';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${senderName}</div>
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">${time}</div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            showTypingIndicator() {
+                this.typingIndicator.classList.add('active');
+            }
+            
+            hideTypingIndicator() {
+                this.typingIndicator.classList.remove('active');
+            }
+            
+            updateStatus(status, type) {
+                this.lunaStatus.textContent = status;
+                this.lunaStatus.className = `status-${type}`;
+            }
+            
+            updateMetrics() {
+                // Update beautiful metrics
+                this.apiSpeed.textContent = this.interactionCount > 5 ? 'Ultra Fast' : 'Fast';
+                this.systemHealth.textContent = this.interactionCount > 10 ? 'Perfect' : 'Excellent';
+            }
+            
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+        }
+        
+        // BioCore action functions
+        function applyBioCore(effectType) {
+            const app = new BeautifulLunaApp();
+            app.addLunaMessage(`🌿 Applying ${effectType} BioCore effects to create beautiful visualizations...`, 'luna');
+            app.updateStatus('🟡 Processing BioCore...', 'thinking');
+            
+            setTimeout(() => {
+                app.addLunaMessage(`✨ ${effectType.charAt(0).toUpperCase() + effectType.slice(1)} BioCore effects applied successfully! The beautiful gradients show improved homeostatic balance across target zones. System optimization increased by 12% with stunning visual feedback!`, 'luna');
+                app.updateStatus('🟢 BioCore Applied', 'active');
+                app.updateMetrics();
+            }, 2000);
+        }
+        
+        function refreshSystem() {
+            const app = new BeautifulLunaApp();
+            app.addLunaMessage('🔄 Refreshing system data for beautiful visualizations...', 'luna');
+            app.updateStatus('🟡 Refreshing...', 'thinking');
+            
+            setTimeout(() => {
+                app.addLunaMessage('✨ System refreshed successfully! All beautiful gradients updated with latest real-time data. City homeostatic balance: 94%. API response time: 45ms. Visual performance: Excellent!', 'luna');
+                app.updateStatus('🟢 System Refreshed', 'active');
+                app.updateMetrics();
+            }, 1500);
+        }
+        
+        // Initialize beautiful app
+        const app = new BeautifulLunaApp();
+        
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = app.messageInput.value.trim();
+            if (message) {
+                app.askLuna(message);
+                app.messageInput.value = '';
+            }
+        });
+        
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = app.messageInput.value.trim();
+                if (message) {
+                    app.askLuna(message);
+                    app.messageInput.value = '';
+                }
+            }
+        });
+        
+        // Auto-connect to beautiful Luna
+        setTimeout(() => {
+            app.initializeBeautifulLuna();
+        }, 1000);
+    </script>
+</body>
+</html>
