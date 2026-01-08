@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 LunaBeyond AI - Real-Time Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d1b69 50%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #9333ea, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .connected {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+
+        .disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .chat-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .luna-message {
+            background: linear-gradient(135deg, #9333ea, #7c3aed);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-sender {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .message-content {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: #9333ea;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .send-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #9333ea, #7c3aed);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(147, 51, 234, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+        }
+
+        .panel h3 {
+            color: #a78bfa;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .system-status {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .status-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .zone-status {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .zone-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .zone-name {
+            font-size: 0.9rem;
+        }
+
+        .zone-metrics {
+            display: flex;
+            gap: 10px;
+        }
+
+        .zone-metric {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .insight-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #a78bfa;
+        }
+
+        .insight-type {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .insight-content {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(255,255,255,0.1);
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #a78bfa;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.7;
+        }
+
+        .welcome-message h3 {
+            color: #a78bfa;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .chat-section, .info-section {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌙 LunaBeyond AI - Real-Time Chat</h1>
+        <div class="connection-status disconnected" id="connectionStatus">
+            🔴 Connecting to Luna...
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="chat-section">
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h3>🌙 Welcome to LunaBeyond AI</h3>
+                    <p>Connecting to your intelligent assistant for the Homeostatic City BioCore system...</p>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Ask Luna about zones, BioCore effects, or system optimization..." disabled>
+                <button class="send-button" id="sendButton" disabled>Send</button>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="panel">
+                <h3>📊 System Status</h3>
+                <div class="system-status" id="systemStatus">
+                    <div class="status-item">
+                        <div class="status-label">Status</div>
+                        <div class="status-value" id="systemStatusValue">--</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Uptime</div>
+                        <div class="status-value" id="uptimeValue">--</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Messages</div>
+                        <div class="status-value" id="messagesValue">--</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Clients</div>
+                        <div class="status-value" id="clientsValue">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>🏙️ Zone Status</h3>
+                <div class="zone-status" id="zoneStatus">
+                    <!-- Zones will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>💡 Luna Insights</h3>
+                <div class="insights-list" id="insightsList">
+                    <div class="insight-item">
+                        <div class="insight-type">System</div>
+                        <div class="insight-content">Waiting for Luna to analyze system data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Luna Chat Application
+        class LunaChatApp {
+            constructor() {
+                this.websocket = null;
+                this.isConnected = false;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                
+                this.initializeElements();
+                this.connectToLuna();
+            }
+
+            initializeElements() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.connectionStatus = document.getElementById('connectionStatus');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.systemStatus = document.getElementById('systemStatus');
+                this.zoneStatus = document.getElementById('zoneStatus');
+                this.insightsList = document.getElementById('insightsList');
+
+                // Event listeners
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+            }
+
+            connectToLuna() {
+                try {
+                    console.log('🌙 Connecting to LunaBeyond AI...');
+                    this.websocket = new WebSocket('ws://localhost:8765');
+
+                    this.websocket.onopen = () => {
+                        console.log('✅ Connected to LunaBeyond AI');
+                        this.isConnected = true;
+                        this.reconnectAttempts = 0;
+                        this.updateConnectionStatus(true);
+                        this.enableChat();
+                        this.clearWelcomeMessage();
+                        this.requestSystemStatus();
+                    };
+
+                    this.websocket.onmessage = (event) => {
+                        this.handleMessage(JSON.parse(event.data));
+                    };
+
+                    this.websocket.onclose = () => {
+                        console.log('🔴 Disconnected from LunaBeyond AI');
+                        this.isConnected = false;
+                        this.updateConnectionStatus(false);
+                        this.disableChat();
+                        this.attemptReconnect();
+                    };
+
+                    this.websocket.onerror = (error) => {
+                        console.error('❌ WebSocket error:', error);
+                        this.showError('Connection error. Make sure Luna server is running.');
+                    };
+
+                } catch (error) {
+                    console.error('❌ Connection failed:', error);
+                    this.showError('Failed to connect to Luna. Please start the Luna server first.');
+                }
+            }
+
+            handleMessage(data) {
+                console.log('🌙 Received message:', data);
+
+                switch (data.type) {
+                    case 'luna_message':
+                        this.hideTypingIndicator();
+                        this.addMessage(data.data.message, 'luna', data.data.timestamp);
+                        break;
+                    
+                    case 'system_status':
+                        this.updateSystemStatus(data.data);
+                        break;
+                    
+                    case 'system_update':
+                        this.updateSystemStatus(data.data);
+                        break;
+                    
+                    case 'luna_insights':
+                        this.updateInsights(data.data.insights);
+                        break;
+                }
+            }
+
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message || !this.isConnected) return;
+
+                // Add user message to chat
+                this.addMessage(message, 'user');
+                
+                // Send to Luna
+                const messageData = {
+                    type: 'user_message',
+                    data: {
+                        message: message
+                    }
+                };
+                
+                this.websocket.send(JSON.stringify(messageData));
+                
+                // Clear input and show typing indicator
+                this.messageInput.value = '';
+                this.showTypingIndicator();
+            }
+
+            addMessage(content, sender, timestamp = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const time = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+                const senderName = sender === 'luna' ? '🌙 Luna' : '👤 You';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${senderName}</div>
+                    <div class="message-content">${content}</div>
+                    <div class="message-time">${time}</div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            showTypingIndicator() {
+                this.typingIndicator.classList.add('active');
+                this.scrollToBottom();
+            }
+
+            hideTypingIndicator() {
+                this.typingIndicator.classList.remove('active');
+            }
+
+            updateConnectionStatus(connected) {
+                const statusElement = this.connectionStatus;
+                if (connected) {
+                    statusElement.className = 'connection-status connected';
+                    statusElement.innerHTML = '🟢 Connected to Luna';
+                } else {
+                    statusElement.className = 'connection-status disconnected';
+                    statusElement.innerHTML = '🔴 Disconnected from Luna';
+                }
+            }
+
+            enableChat() {
+                this.messageInput.disabled = false;
+                this.sendButton.disabled = false;
+                this.messageInput.placeholder = 'Ask Luna about zones, BioCore effects, or system optimization...';
+            }
+
+            disableChat() {
+                this.messageInput.disabled = true;
+                this.sendButton.disabled = true;
+                this.messageInput.placeholder = 'Connecting to Luna...';
+            }
+
+            clearWelcomeMessage() {
+                const welcomeMessage = this.chatMessages.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+            }
+
+            updateSystemStatus(data) {
+                if (data.system_state) {
+                    const state = data.system_state;
+                    document.getElementById('systemStatusValue').textContent = state.status || 'Active';
+                    document.getElementById('uptimeValue').textContent = state.uptime || '0s';
+                    document.getElementById('messagesValue').textContent = state.messages_processed || '0';
+                    document.getElementById('clientsValue').textContent = '1'; // Current user
+
+                    // Update zones
+                    if (state.zones) {
+                        this.updateZoneStatus(state.zones);
+                    }
+                }
+
+                if (data.luna_insights) {
+                    this.updateInsights(data.luna_insights);
+                }
+            }
+
+            updateZoneStatus(zones) {
+                this.zoneStatus.innerHTML = '';
+                
+                Object.entries(zones).forEach(([zoneName, zoneData]) => {
+                    const zoneDiv = document.createElement('div');
+                    zoneDiv.className = 'zone-item';
+                    
+                    const displayName = zoneName.charAt(0).toUpperCase() + zoneName.slice(1);
+                    const activity = (zoneData.activity || 0).toFixed(2);
+                    const stress = (zoneData.stress || 0).toFixed(2);
+                    
+                    zoneDiv.innerHTML = `
+                        <div class="zone-name">${displayName}</div>
+                        <div class="zone-metrics">
+                            <div class="zone-metric">Activity: ${activity}</div>
+                            <div class="zone-metric">Stress: ${stress}</div>
+                        </div>
+                    `;
+                    
+                    this.zoneStatus.appendChild(zoneDiv);
+                });
+            }
+
+            updateInsights(insights) {
+                this.insightsList.innerHTML = '';
+                
+                insights.forEach(insight => {
+                    const insightDiv = document.createElement('div');
+                    insightDiv.className = 'insight-item';
+                    
+                    const confidence = (insight.confidence || 0).toFixed(2);
+                    
+                    insightDiv.innerHTML = `
+                        <div class="insight-type">${insight.type || 'Analysis'} (Confidence: ${confidence})</div>
+                        <div class="insight-content">${insight.content}</div>
+                    `;
+                    
+                    this.insightsList.appendChild(insightDiv);
+                });
+            }
+
+            requestSystemStatus() {
+                if (this.isConnected) {
+                    this.websocket.send(JSON.stringify({ type: 'get_status' }));
+                }
+            }
+
+            requestInsights() {
+                if (this.isConnected) {
+                    this.websocket.send(JSON.stringify({ type: 'get_insights' }));
+                }
+            }
+
+            attemptReconnect() {
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    console.log(`🔄 Reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+                    
+                    setTimeout(() => {
+                        this.connectToLuna();
+                    }, 3000 * this.reconnectAttempts);
+                } else {
+                    this.showError('Failed to reconnect to Luna. Please refresh the page and make sure the Luna server is running.');
+                }
+            }
+
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message luna-message';
+                errorDiv.innerHTML = `
+                    <div class="message-sender">⚠️ System</div>
+                    <div class="message-content">${message}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                `;
+                
+                this.chatMessages.appendChild(errorDiv);
+                this.scrollToBottom();
+            }
+
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🌙 Initializing Luna Chat Dashboard...');
+            const app = new LunaChatApp();
+            
+            // Request periodic updates
+            setInterval(() => {
+                if (app.isConnected) {
+                    app.requestSystemStatus();
+                    app.requestInsights();
+                }
+            }, 10000); // Every 10 seconds
+        });
+    </script>
+</body>
+</html>
