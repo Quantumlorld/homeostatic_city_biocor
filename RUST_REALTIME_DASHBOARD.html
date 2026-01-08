@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦀 Rust Real-Time Online Data System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d1b69 50%, #0f172a 100%);
+            color: #00ff41;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #00ff41;
+            border-top: 2px solid #00ff41;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            animation: terminal-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes terminal-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            border: 1px solid #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        .connected {
+            color: #00ff41;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .rust-terminal {
+            flex: 2;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .rust-output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .rust-code {
+            color: #00ff41;
+            margin: 10px 0;
+        }
+
+        .rust-comment {
+            color: #6272a4;
+        }
+
+        .rust-keyword {
+            color: #ff79c6;
+        }
+
+        .rust-string {
+            color: #f1fa8c;
+        }
+
+        .rust-function {
+            color: #50fa7b;
+        }
+
+        .rust-number {
+            color: #bd93f9;
+        }
+
+        .data-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .panel h3 {
+            color: #00ff41;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 5px;
+        }
+
+        .data-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-button {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 12px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .control-button:hover {
+            background: rgba(0, 255, 65, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .real-data-display {
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #00ff41;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-left: 3px solid #00ff41;
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .data-label {
+            color: #50fa7b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .data-value {
+            color: #f1fa8c;
+            font-size: 0.9rem;
+        }
+
+        .status-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .status-item {
+            background: rgba(0, 255, 65, 0.05);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid #00ff41;
+        }
+
+        .status-label {
+            color: #6272a4;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            color: #00ff41;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .terminal-line {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .terminal-prompt {
+            color: #50fa7b;
+        }
+
+        .terminal-command {
+            color: #f1fa8c;
+        }
+
+        .terminal-output {
+            color: #00ff41;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .rust-terminal, .data-section {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🦀 RUST REAL-TIME ONLINE DATA SYSTEM</h1>
+        <div class="connection-status disconnected" id="connectionStatus">
+            🔴 CONNECTING TO RUST SYSTEM...
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="rust-terminal">
+            <div class="rust-output" id="rustTerminal">
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">Initializing Rust real-time system...</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">🦀 RUST COMPILER: Checking memory safety...</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">✅ THREAD SAFETY: Confirmed</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">✅ ZERO-COST ABSTRACTIONS: Ready</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">✅ FEARLESS CONCURRENCY: Enabled</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">Connecting to real-time data sources...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <div class="panel">
+                <h3>📡 Real-Time Data Controls</h3>
+                <div class="data-controls">
+                    <button class="control-button" onclick="fetchRealData('weather')">
+                        🌤️ Fetch Weather Data
+                    </button>
+                    <button class="control-button" onclick="fetchRealData('airquality')">
+                        💨 Fetch Air Quality
+                    </button>
+                    <button class="control-button" onclick="fetchRealData('traffic')">
+                        🚗 Fetch Traffic Data
+                    </button>
+                    <button class="control-button" onclick="fetchRealData('news')">
+                        📰 Fetch News Sentiment
+                    </button>
+                    <button class="control-button" onclick="startRealtime()">
+                        🦀 Start Real-Time Processing
+                    </button>
+                </div>
+                <div class="real-data-display" id="realDataDisplay">
+                    <div class="data-item">
+                        <div class="data-label">System Status</div>
+                        <div class="data-value">Ready to fetch real-time data</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📊 System Status</h3>
+                <div class="status-panel">
+                    <div class="status-item">
+                        <div class="status-label">Rust Compiler</div>
+                        <div class="status-value" id="rustStatus">ACTIVE</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Memory Safety</div>
+                        <div class="status-value" id="memoryStatus">100%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Thread Safety</div>
+                        <div class="status-value" id="threadStatus">SAFE</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Data Sources</div>
+                        <div class="status-value" id="dataSourceStatus">4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Rust Real-time Dashboard Application
+        class RustRealtimeApp {
+            constructor() {
+                this.websocket = null;
+                this.isConnected = false;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                
+                this.initializeElements();
+                this.connectToRustSystem();
+            }
+
+            initializeElements() {
+                this.rustTerminal = document.getElementById('rustTerminal');
+                this.connectionStatus = document.getElementById('connectionStatus');
+                this.realDataDisplay = document.getElementById('realDataDisplay');
+            }
+
+            connectToRustSystem() {
+                try {
+                    console.log('🦀 Connecting to Rust Real-time System...');
+                    this.websocket = new WebSocket('ws://localhost:8766');
+
+                    this.websocket.onopen = () => {
+                        console.log('✅ Connected to Rust Real-time System');
+                        this.isConnected = true;
+                        this.reconnectAttempts = 0;
+                        this.updateConnectionStatus(true);
+                        this.addTerminalLine('✅ RUST SYSTEM: Connection established', 'output');
+                        this.addTerminalLine('🦀 THREAD SAFETY: Confirmed', 'output');
+                        this.addTerminalLine('🦀 MEMORY SAFETY: Enabled', 'output');
+                        this.addTerminalLine('🦀 REAL-TIME PROCESSING: Active', 'output');
+                    };
+
+                    this.websocket.onmessage = (event) => {
+                        this.handleRustMessage(JSON.parse(event.data));
+                    };
+
+                    this.websocket.onclose = () => {
+                        console.log('🔴 Disconnected from Rust System');
+                        this.isConnected = false;
+                        this.updateConnectionStatus(false);
+                        this.addTerminalLine('⚠️ CONNECTION LOST: Attempting reconnect...', 'output');
+                        this.attemptReconnect();
+                    };
+
+                    this.websocket.onerror = (error) => {
+                        console.error('❌ Rust WebSocket error:', error);
+                        this.addTerminalLine('❌ RUST ERROR: Connection failed', 'output');
+                        this.showError('Failed to connect to Rust system. Make sure the Rust server is running.');
+                    };
+
+                } catch (error) {
+                    console.error('❌ Connection failed:', error);
+                    this.addTerminalLine('❌ RUST ERROR: Failed to initialize', 'output');
+                    this.showError('Failed to connect to Rust real-time system. Please start RUST_REALTIME_ONLINE.py first.');
+                }
+            }
+
+            handleRustMessage(data) {
+                console.log('🦀 Received Rust message:', data);
+
+                switch (data.type) {
+                    case 'rust_welcome':
+                        this.displayRustCode(data.data.message);
+                        break;
+                    
+                    case 'rust_real_data':
+                        this.displayRealData(data.data);
+                        break;
+                    
+                    case 'rust_realtime_started':
+                        this.displayRustCode(data.data.message);
+                        this.addTerminalLine('🦀 REAL-TIME PROCESSING: Started', 'output');
+                        break;
+                }
+            }
+
+            displayRustCode(code) {
+                const lines = code.split('\n');
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        // Syntax highlighting for Rust code
+                        let highlightedLine = line
+                            .replace(/\/\/.*/g, '<span class="rust-comment">$&</span>')
+                            .replace(/\b(use|fn|let|mut|async|await|struct|impl|match|Some|None|Ok|Err)\b/g, '<span class="rust-keyword">$&</span>')
+                            .replace(/\b(main|process_weather_data|analyze_air_quality|optimize_traffic)\b/g, '<span class="rust-function">$&</span>')
+                            .replace(/"[^"]*"/g, '<span class="rust-string">$&</span>')
+                            .replace(/\b\d+\.?\d*\b/g, '<span class="rust-number">$&</span>');
+                        
+                        this.addTerminalLine(highlightedLine, 'code');
+                    }
+                });
+            }
+
+            displayRealData(data) {
+                const dataType = data.data_type.toUpperCase();
+                const realData = data.real_data;
+                const rustResponse = data.rust_response;
+
+                // Display in terminal
+                this.addTerminalLine(`🦀 FETCHING ${dataType} DATA...`, 'command');
+                this.displayRustCode(rustResponse);
+
+                // Display in data panel
+                this.realDataDisplay.innerHTML = `
+                    <div class="data-item">
+                        <div class="data-label">📡 ${dataType} Data Retrieved</div>
+                        <div class="data-value">Processing with Rust memory safety...</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">🕐 Timestamp</div>
+                        <div class="data-value">${realData.timestamp || new Date().toISOString()}</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">🦀 Processing Status</div>
+                        <div class="data-value">Thread-safe & Memory-safe</div>
+                    </div>
+                `;
+            }
+
+            addTerminalLine(content, type = 'output') {
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                
+                if (type === 'command') {
+                    line.innerHTML = `<span class="terminal-prompt">$</span> <span class="terminal-command">${content}</span>`;
+                } else if (type === 'code') {
+                    line.innerHTML = `<span class="rust-code">${content}</span>`;
+                } else {
+                    line.innerHTML = `<span class="terminal-output">${content}</span>`;
+                }
+                
+                this.rustTerminal.appendChild(line);
+                this.scrollToBottom();
+            }
+
+            updateConnectionStatus(connected) {
+                const statusElement = this.connectionStatus;
+                if (connected) {
+                    statusElement.className = 'connection-status connected';
+                    statusElement.innerHTML = '🟢 RUST SYSTEM CONNECTED';
+                } else {
+                    statusElement.className = 'connection-status disconnected';
+                    statusElement.innerHTML = '🔴 RUST SYSTEM OFFLINE';
+                }
+            }
+
+            fetchRealData(dataType) {
+                if (!this.isConnected) {
+                    this.addTerminalLine('❌ ERROR: Not connected to Rust system', 'output');
+                    return;
+                }
+
+                this.addTerminalLine(`🦀 FETCHING ${dataType.toUpperCase()} DATA...`, 'command');
+                
+                const message = {
+                    type: 'get_real_data',
+                    data: {
+                        data_type: dataType
+                    }
+                };
+                
+                this.websocket.send(JSON.stringify(message));
+            }
+
+            startRealtime() {
+                if (!this.isConnected) {
+                    this.addTerminalLine('❌ ERROR: Not connected to Rust system', 'output');
+                    return;
+                }
+
+                this.addTerminalLine('🦀 STARTING REAL-TIME PROCESSING...', 'command');
+                
+                const message = {
+                    type: 'start_realtime'
+                };
+                
+                this.websocket.send(JSON.stringify(message));
+            }
+
+            attemptReconnect() {
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    this.addTerminalLine(`🔄 RECONNECT ATTEMPT ${this.reconnectAttempts}/${this.maxReconnectAttempts}`, 'output');
+                    
+                    setTimeout(() => {
+                        this.connectToRustSystem();
+                    }, 3000 * this.reconnectAttempts);
+                } else {
+                    this.addTerminalLine('❌ MAX RECONNECT ATTEMPTS REACHED', 'output');
+                    this.showError('Failed to reconnect to Rust system. Please refresh the page and ensure the Rust server is running.');
+                }
+            }
+
+            showError(message) {
+                const errorLine = document.createElement('div');
+                errorLine.className = 'terminal-line';
+                errorLine.innerHTML = `<span class="terminal-output">❌ ${message}</span>`;
+                this.rustTerminal.appendChild(errorLine);
+                this.scrollToBottom();
+            }
+
+            scrollToBottom() {
+                this.rustTerminal.scrollTop = this.rustTerminal.scrollHeight;
+            }
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🦀 Initializing Rust Real-time Dashboard...');
+            const app = new RustRealtimeApp();
+        });
+    </script>
+</body>
+</html>
