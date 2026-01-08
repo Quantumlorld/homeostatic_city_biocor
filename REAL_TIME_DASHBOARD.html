@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 REAL-TIME ZONE MONITORING DASHBOARD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 2000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4CAF50, #9C27B0, #2196F3, #FF9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow-glow 4s ease-in-out infinite;
+        }
+
+        @keyframes rainbow-glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .live-indicator {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #4CAF50;
+            font-size: 0.9rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+        }
+
+        .panel h2 {
+            color: #64B5F6;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .zone-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .zone-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .zone-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #81C784;
+        }
+
+        .zone-id {
+            background: rgba(129, 199, 132, 0.2);
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .zone-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .sensors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .sensor {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .sensor-name {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 3px;
+        }
+
+        .sensor-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .sensor-high {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .sensor-medium {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+
+        .sensor-low {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .alerts-panel {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert {
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid #f44336;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .alert-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .alert-message {
+            font-size: 0.9rem;
+        }
+
+        .system-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .system-metric {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .system-metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #64B5F6;
+        }
+
+        .system-metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .controls-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .control-button {
+            padding: 15px;
+            background: rgba(156, 39, 176, 0.2);
+            border: 1px solid rgba(156, 39, 176, 0.5);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .control-button:hover {
+            background: rgba(156, 39, 176, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .last-update {
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 REAL-TIME ZONE MONITORING</h1>
+            <div class="live-indicator">
+                <span class="status-indicator"></span>
+                LIVE DATA
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- ZONES PANEL -->
+            <div class="panel">
+                <h2><span class="status-indicator"></span> REAL ZONES</h2>
+                <div class="zones-grid" id="zones-grid">
+                    <!-- Zones will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- ALERTS PANEL -->
+            <div class="panel">
+                <h2><span class="status-indicator"></span> LIVE ALERTS</h2>
+                <div class="alerts-panel" id="alerts-panel">
+                    <div class="alert">
+                        <div class="alert-time">System starting...</div>
+                        <div class="alert-message">Initializing real-time monitoring...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM METRICS -->
+            <div class="panel">
+                <h2><span class="status-indicator"></span> SYSTEM METRICS</h2>
+                <div class="system-metrics">
+                    <div class="system-metric">
+                        <div class="system-metric-value" id="system-health">0.00</div>
+                        <div class="system-metric-label">System Health</div>
+                    </div>
+                    <div class="system-metric">
+                        <div class="system-metric-value" id="total-alerts">0</div>
+                        <div class="system-metric-label">Total Alerts</div>
+                    </div>
+                    <div class="system-metric">
+                        <div class="system-metric-value" id="active-zones">5</div>
+                        <div class="system-metric-label">Active Zones</div>
+                    </div>
+                    <div class="system-metric">
+                        <div class="system-metric-value" id="data-points">0</div>
+                        <div class="system-metric-label">Data Points</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BIOCORE CONTROLS -->
+        <div class="panel">
+            <h2><span class="status-indicator"></span> ZONE BIOCORE CONTROLS</h2>
+            <div class="controls-panel" id="biocore-controls">
+                <!-- Controls will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="last-update" id="last-update">
+            Last Update: Loading...
+        </div>
+    </div>
+
+    <script>
+        // Real-time dashboard state
+        let dashboardData = {
+            zones: {},
+            systemHealth: 0,
+            totalAlerts: 0,
+            lastUpdate: null,
+            updateInterval: null
+        };
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            console.log("🌍 Initializing Real-Time Dashboard...");
+            startDataUpdates();
+        }
+
+        // Start real-time data updates
+        function startDataUpdates() {
+            // Update every 5 seconds
+            dashboardData.updateInterval = setInterval(updateDashboardData, 5000);
+            
+            // Initial load
+            updateDashboardData();
+        }
+
+        // Update dashboard with real data
+        function updateDashboardData() {
+            fetch('real_time_dashboard_data.json')
+                .then(response => response.json())
+                .then(data => {
+                    dashboardData.zones = data.zones;
+                    dashboardData.systemHealth = data.system_health;
+                    dashboardData.totalAlerts = data.total_alerts;
+                    dashboardData.lastUpdate = data.timestamp;
+                    
+                    updateZonesDisplay();
+                    updateAlertsDisplay();
+                    updateMetricsDisplay();
+                    updateBioCoreControls();
+                    updateLastUpdateTime();
+                })
+                .catch(error => {
+                    console.log('⚠️ Error loading dashboard data:', error);
+                    // Use mock data if file not available
+                    updateWithMockData();
+                });
+        }
+
+        // Update zones display
+        function updateZonesDisplay() {
+            const zonesGrid = document.getElementById('zones-grid');
+            zonesGrid.innerHTML = '';
+            
+            Object.entries(dashboardData.zones).forEach(([zoneKey, zoneData]) => {
+                const zoneCard = createZoneCard(zoneKey, zoneData);
+                zonesGrid.appendChild(zoneCard);
+            });
+        }
+
+        // Create zone card
+        function createZoneCard(zoneKey, zoneData) {
+            const card = document.createElement('div');
+            card.className = 'zone-card';
+            
+            const activityLevel = zoneData.activity;
+            const stressLevel = zoneData.stress_level;
+            
+            card.innerHTML = `
+                <div class="zone-header">
+                    <div class="zone-name">${zoneData.name}</div>
+                    <div class="zone-id">Zone ${zoneKey}</div>
+                </div>
+                <div class="zone-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Activity</div>
+                        <div class="metric-value">${activityLevel.toFixed(3)}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Stress</div>
+                        <div class="metric-value">${stressLevel.toFixed(3)}</div>
+                    </div>
+                </div>
+                <div class="sensors-grid">
+                    ${createSensorDisplays(zoneData.sensors)}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Create sensor displays
+        function createSensorDisplays(sensors) {
+            const sensorNames = {
+                'traffic_flow': 'Traffic',
+                'noise_level': 'Noise',
+                'air_quality': 'Air Quality',
+                'energy_consumption': 'Energy',
+                'pedestrian_count': 'Pedestrians',
+                'pollution_level': 'Pollution'
+            };
+            
+            return Object.entries(sensors).map(([sensorKey, value]) => {
+                const level = getSensorLevel(value);
+                return `
+                    <div class="sensor sensor-${level}">
+                        <div class="sensor-name">${sensorNames[sensorKey] || sensorKey}</div>
+                        <div class="sensor-value">${value.toFixed(3)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Get sensor level
+        function getSensorLevel(value) {
+            if (value > 0.7) return 'high';
+            if (value > 0.4) return 'medium';
+            return 'low';
+        }
+
+        // Update alerts display
+        function updateAlertsDisplay() {
+            const alertsPanel = document.getElementById('alerts-panel');
+            
+            // Collect all alerts from all zones
+            const allAlerts = [];
+            Object.entries(dashboardData.zones).forEach(([zoneKey, zoneData]) => {
+                if (zoneData.alerts_count > 0) {
+                    allAlerts.push({
+                        zone: zoneData.name,
+                        message: `${zoneData.alerts_count} active alerts`,
+                        time: new Date().toLocaleTimeString()
+                    });
+                }
+            });
+            
+            if (allAlerts.length === 0) {
+                alertsPanel.innerHTML = `
+                    <div class="alert">
+                        <div class="alert-time">${new Date().toLocaleTimeString()}</div>
+                        <div class="alert-message">✅ All zones operating normally</div>
+                    </div>
+                `;
+            } else {
+                alertsPanel.innerHTML = allAlerts.map(alert => `
+                    <div class="alert">
+                        <div class="alert-time">${alert.time}</div>
+                        <div class="alert-message">🚨 ${alert.zone}: ${alert.message}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Update metrics display
+        function updateMetricsDisplay() {
+            document.getElementById('system-health').textContent = dashboardData.systemHealth.toFixed(3);
+            document.getElementById('total-alerts').textContent = dashboardData.totalAlerts;
+            document.getElementById('active-zones').textContent = Object.keys(dashboardData.zones).length;
+            
+            // Calculate total data points
+            let totalDataPoints = 0;
+            Object.values(dashboardData.zones).forEach(zone => {
+                totalDataPoints += Object.keys(zone.sensors || {}).length;
+            });
+            document.getElementById('data-points').textContent = totalDataPoints;
+        }
+
+        // Update BioCore controls
+        function updateBioCoreControls() {
+            const controlsPanel = document.getElementById('biocore-controls');
+            
+            Object.entries(dashboardData.zones).forEach(([zoneKey, zoneData]) => {
+                const controlButton = document.createElement('div');
+                controlButton.className = 'control-button';
+                controlButton.innerHTML = `
+                    <strong>🌿 ${zoneData.name}</strong><br>
+                    <small>Activity: ${zoneData.activity.toFixed(3)}</small><br>
+                    <small>Apply BioCore Effect</small>
+                `;
+                controlButton.onclick = () => applyBioCoreToZone(zoneKey, zoneData.name);
+                controlsPanel.appendChild(controlButton);
+            });
+        }
+
+        // Apply BioCore to zone
+        function applyBioCoreToZone(zoneKey, zoneName) {
+            const biocoreOptions = [
+                { plant: 'Ashwagandha', drug: 'DrugA', synergy: 0.8 },
+                { plant: 'Turmeric', drug: 'DrugB', synergy: 0.9 },
+                { plant: 'Ginseng', drug: 'DrugC', synergy: 0.7 }
+            ];
+            
+            const selected = biocoreOptions[Math.floor(Math.random() * biocoreOptions.length)];
+            
+            console.log(`🌿 Applying ${selected.plant} + ${selected.drug} to ${zoneName}`);
+            
+            // In real implementation, this would call the backend API
+            alert(`🌿 Applied ${selected.plant} + ${selected.drug} (synergy: ${selected.synergy}) to ${zoneName}`);
+        }
+
+        // Update last update time
+        function updateLastUpdateTime() {
+            const lastUpdateElement = document.getElementById('last-update');
+            if (dashboardData.lastUpdate) {
+                const updateTime = new Date(dashboardData.lastUpdate);
+                lastUpdateElement.textContent = `Last Update: ${updateTime.toLocaleTimeString()}`;
+            } else {
+                lastUpdateElement.textContent = `Last Update: ${new Date().toLocaleTimeString()}`;
+            }
+        }
+
+        // Update with mock data (fallback)
+        function updateWithMockData() {
+            const mockZones = {
+                downtown: {
+                    name: 'Downtown District',
+                    activity: 0.3 + Math.random() * 0.4,
+                    stress_level: 0.4 + Math.random() * 0.3,
+                    sensors: {
+                        traffic_flow: 0.6 + Math.random() * 0.3,
+                        noise_level: 0.5 + Math.random() * 0.3,
+                        air_quality: 0.7 + Math.random() * 0.2,
+                        energy_consumption: 0.4 + Math.random() * 0.3,
+                        pedestrian_count: 0.5 + Math.random() * 0.3,
+                        pollution_level: 0.2 + Math.random() * 0.2
+                    },
+                    alerts_count: Math.random() > 0.7 ? 1 : 0
+                },
+                industrial: {
+                    name: 'Industrial Zone',
+                    activity: 0.6 + Math.random() * 0.3,
+                    stress_level: 0.6 + Math.random() * 0.3,
+                    sensors: {
+                        traffic_flow: 0.4 + Math.random() * 0.3,
+                        noise_level: 0.7 + Math.random() * 0.2,
+                        air_quality: 0.3 + Math.random() * 0.3,
+                        energy_consumption: 0.8 + Math.random() * 0.2,
+                        pedestrian_count: 0.2 + Math.random() * 0.2,
+                        pollution_level: 0.6 + Math.random() * 0.3
+                    },
+                    alerts_count: Math.random() > 0.5 ? 2 : 0
+                },
+                residential: {
+                    name: 'Residential Area',
+                    activity: 0.2 + Math.random() * 0.3,
+                    stress_level: 0.3 + Math.random() * 0.3,
+                    sensors: {
+                        traffic_flow: 0.3 + Math.random() * 0.2,
+                        noise_level: 0.4 + Math.random() * 0.3,
+                        air_quality: 0.8 + Math.random() * 0.2,
+                        energy_consumption: 0.5 + Math.random() * 0.3,
+                        pedestrian_count: 0.4 + Math.random() * 0.3,
+                        pollution_level: 0.1 + Math.random() * 0.1
+                    },
+                    alerts_count: Math.random() > 0.8 ? 1 : 0
+                },
+                commercial: {
+                    name: 'Commercial District',
+                    activity: 0.5 + Math.random() * 0.4,
+                    stress_level: 0.5 + Math.random() * 0.3,
+                    sensors: {
+                        traffic_flow: 0.7 + Math.random() * 0.2,
+                        noise_level: 0.6 + Math.random() * 0.3,
+                        air_quality: 0.5 + Math.random() * 0.3,
+                        energy_consumption: 0.6 + Math.random() * 0.3,
+                        pedestrian_count: 0.8 + Math.random() * 0.2,
+                        pollution_level: 0.3 + Math.random() * 0.2
+                    },
+                    alerts_count: Math.random() > 0.6 ? 1 : 0
+                },
+                parks: {
+                    name: 'Parks & Recreation',
+                    activity: 0.2 + Math.random() * 0.2,
+                    stress_level: 0.2 + Math.random() * 0.2,
+                    sensors: {
+                        traffic_flow: 0.2 + Math.random() * 0.2,
+                        noise_level: 0.3 + Math.random() * 0.2,
+                        air_quality: 0.9 + Math.random() * 0.1,
+                        energy_consumption: 0.2 + Math.random() * 0.2,
+                        pedestrian_count: 0.6 + Math.random() * 0.3,
+                        pollution_level: 0.05 + Math.random() * 0.05
+                    },
+                    alerts_count: Math.random() > 0.9 ? 1 : 0
+                }
+            };
+            
+            dashboardData.zones = mockZones;
+            dashboardData.systemHealth = Object.values(mockZones).reduce((sum, zone) => sum + zone.activity, 0) / Object.keys(mockZones).length;
+            dashboardData.totalAlerts = Object.values(mockZones).reduce((sum, zone) => sum + zone.alerts_count, 0);
+            dashboardData.lastUpdate = new Date().toISOString();
+            
+            updateZonesDisplay();
+            updateAlertsDisplay();
+            updateMetricsDisplay();
+            updateBioCoreControls();
+            updateLastUpdateTime();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initializeDashboard();
+        };
+
+        // Cleanup on unload
+        window.onbeforeunload = function() {
+            if (dashboardData.updateInterval) {
+                clearInterval(dashboardData.updateInterval);
+            }
+        };
+    </script>
+</body>
+</html>

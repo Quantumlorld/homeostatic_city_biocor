@@ -15,7 +15,18 @@ sys.path.append(str(Path(__file__).parent))
 sys.path.append(str(Path(__file__).parent / "lunabeyond-ai" / "src"))
 
 from test_system import BHCS, BioCore
-from lunabeyond_ai.src.ai_interface import LunaBeyondInterface
+# from lunabeyond_ai.src.ai_interface import LunaBeyondInterface
+# Mock LunaBeyond interface for now
+class LunaBeyondInterface:
+    def __init__(self):
+        self.name = "LunaBeyond AI Mock"
+        self.version = "1.0.0"
+    
+    def process_query(self, query: str) -> str:
+        return f"LunaBeyond response to: {query}"
+    
+    def get_status(self) -> dict:
+        return {"status": "active", "mood": "curious", "confidence": 0.85}
 
 class IntegratedBHCSwithAI:
     """Complete BHCS system with LunaBeyond AI integration"""
