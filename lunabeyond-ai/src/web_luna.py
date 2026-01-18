@@ -709,8 +709,8 @@ class LunaWebInterface(BaseHTTPRequestHandler):
 </html>
         """
         
-        self.send_response(200, 'text/html', html_content)
-    
+        self._send_bytes(200, 'text/html', html_content.encode('utf-8'))
+
     def serve_api_status(self):
         """Serve API status"""
         if not self.luna:
@@ -723,9 +723,9 @@ class LunaWebInterface(BaseHTTPRequestHandler):
             'conversations': len(self.luna.conversation_history),
             'timestamp': time.time()
         }
-        
+         
         self.send_json_response(200, status_data)
-    
+
     def serve_api_response(self):
         """Serve general API responses"""
         if not self.luna:
@@ -743,7 +743,7 @@ class LunaWebInterface(BaseHTTPRequestHandler):
             self.send_json_response(200, {'zones': zones_data})
         else:
             self.send_error(404)
-    
+
     def handle_chat_request(self):
         """Handle chat requests"""
         if not self.luna:
@@ -761,7 +761,10 @@ class LunaWebInterface(BaseHTTPRequestHandler):
             asyncio.set_event_loop(loop)
             
             try:
-                response = loop.run_until_complete(self.luna.process_conversation(message))
+                if isinstance(message, str) and message.strip().startswith('/'):
+                    response = loop.run_until_complete(self.luna.handle_command(message.strip()))
+                else:
+                    response = loop.run_until_complete(self.luna.process_conversation(message))
                 
                 # Learn from interaction
                 loop.run_until_complete(self.luna.learn_from_interaction(message, response))
@@ -772,7 +775,7 @@ class LunaWebInterface(BaseHTTPRequestHandler):
                 
         except Exception as e:
             self.send_json_response(500, {'error': str(e)})
-    
+
     def handle_command_request(self):
         """Handle command requests"""
         if not self.luna:
@@ -797,15 +800,18 @@ class LunaWebInterface(BaseHTTPRequestHandler):
                 
         except Exception as e:
             self.send_json_response(500, {'error': str(e)})
-    
-    def send_response(self, status_code, content_type, content):
-        """Send HTTP response"""
-        self.send_response(status_code, content_type, content.encode('utf-8'))
+
+    def _send_bytes(self, status_code: int, content_type: str, content: bytes):
+        super().send_response(status_code)
+        self.send_header('Content-type', content_type)
+        self.send_header('Content-Length', str(len(content)))
+        self.end_headers()
+        self.wfile.write(content)
     
     def send_json_response(self, status_code, data):
         """Send JSON response"""
-        json_data = json.dumps(data, indent=2)
-        self.send_response(status_code, 'application/json', json_data.encode('utf-8'))
+        json_data = json.dumps(data, indent=2).encode('utf-8')
+        self._send_bytes(status_code, 'application/json', json_data)
 
 def run_luna_web_server(port=8080):
     """Run the Luna web interface server"""
@@ -824,4 +830,10 @@ def run_luna_web_server(port=8080):
         httpd.shutdown()
 
 if __name__ == "__main__":
-    run_luna_web_server()
+    port = 8080
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[1])
+        except ValueError:
+            port = 8080
+    run_luna_web_server(port)
