@@ -20,6 +20,8 @@ sys.path.append(str(Path(__file__).parent / "src"))
 
 # Import ALL SYSTEMS
 from python_mock_engine import get_mock_engine
+from enhanced_mock_engine import EnhancedMockEngine
+from weather_integration_adapter import WeatherIntegrationAdapter
 from src.biocore.engine import BioCoreEngine
 from test_system import BHCS, BioCore
 
@@ -36,7 +38,7 @@ except ImportError as e:
     LUNA_SYSTEMS_AVAILABLE = False
 
 class FinalCompleteIntegration:
-    """The ultimate integration of all BHCS and LunaBeyond AI systems"""
+    """The ultimate integration of all BHCS and LunaBeyond AI systems with real weather"""
     
     def __init__(self):
         print("🌙 INITIALIZING FINAL COMPLETE INTEGRATION")
@@ -48,6 +50,11 @@ class FinalCompleteIntegration:
         self.biocore_engine = BioCoreEngine()
         self.bhcs = BHCS(5)
         self.biocore = BioCore()
+        
+        # Initialize Weather Integration
+        print("🌦 Initializing Weather Integration...")
+        self.weather_adapter = WeatherIntegrationAdapter()
+        self.enhanced_engine = self.weather_adapter.get_mock_engine()
         
         # Initialize LunaBeyond AI Systems
         print("🧠 Initializing LunaBeyond AI Systems...")
@@ -69,9 +76,10 @@ class FinalCompleteIntegration:
             'bhcs_active': True,
             'luna_active': True,
             'biocore_active': True,
+            'weather_active': True,
             'voice_active': False,
             'dashboard_open': False,
-            'integration_level': 'COMPLETE'
+            'integration_level': 'COMPLETE_WITH_WEATHER'
         }
         
         # Performance Metrics
@@ -122,33 +130,30 @@ class FinalCompleteIntegration:
         await self._run_integration_loop()
     
     async def _start_bhcs_system(self):
-        """Start BHCS core systems"""
-        print("🦀 Starting BHCS Core Systems...")
+        """Start BHCS core systems with weather integration"""
+        print("🦀 Starting BHCS Core Systems with Weather...")
         
-        # Start mock engine updates
-        def bhcs_updater():
-            while self.system_state['bhcs_active']:
-                self.mock_engine._update_zones()
-                time.sleep(1)
+        # Start enhanced engine with weather
+        self.enhanced_engine.start_engine()
         
-        bhcs_thread = threading.Thread(target=bhcs_updater, daemon=True)
-        bhcs_thread.start()
+        # Start weather integration
+        asyncio.create_task(self.weather_adapter.start_weather_integration())
         
-        print("✅ BHCS Core Systems Started")
+        print("✅ BHCS Core Systems Started with Weather Integration")
     
     async def _start_luna_systems(self):
-        """Start LunaBeyond AI systems"""
-        print("🧠 Starting LunaBeyond AI Systems...")
+        """Start LunaBeyond AI systems with weather awareness"""
+        print("🧠 Starting LunaBeyond AI Systems with Weather Awareness...")
         
         if LUNA_SYSTEMS_AVAILABLE and self.ai_dashboard:
             try:
                 # Start AI dashboard in background
                 asyncio.create_task(self.ai_dashboard.start_dashboard())
-                print("✅ AI Dashboard Started")
+                print("✅ AI Dashboard Started with Weather Integration")
             except Exception as e:
                 print(f"⚠️ AI Dashboard start error: {e}")
         
-        print("✅ LunaBeyond AI Systems Started")
+        print("✅ LunaBeyond AI Systems Started with Weather Awareness")
     
     async def _start_integration_services(self):
         """Start integration services between systems"""
@@ -166,19 +171,30 @@ class FinalCompleteIntegration:
         print("✅ Integration Services Started")
     
     def _synchronize_systems(self):
-        """Synchronize data between all systems"""
+        """Synchronize data between all systems with weather data"""
         try:
-            # Get current BHCS state
-            bhcs_state = self.mock_engine.get_state()
+            # Get current BHCS state with weather
+            bhcs_state = self.enhanced_engine.get_state()
             
-            # Update metrics
+            # Update metrics with weather impacts
             self.metrics['system_health'] = bhcs_state['system_health']
             self.metrics['total_interactions'] += 1
             
-            # Process through Luna AI
+            # Process through Luna AI with weather awareness
             if hasattr(self.enhanced_ai, 'analyze_system'):
-                ai_analysis = self.enhanced_ai.analyze_system(bhcs_state['zones'])
+                ai_analysis = self.enhanced_ai.analyze_system({
+                    'zones': bhcs_state['zones'],
+                    'weather_impacts': bhcs_state['weather_impacts'],
+                    'weather_data': bhcs_state.get('weather_data', {})
+                })
                 self.metrics['ai_predictions'] += 1
+            
+            # Log weather impacts periodically
+            if self.metrics['total_interactions'] % 10 == 0:
+                print("🌦 Weather Impact Summary:")
+                for i, impact in enumerate(bhcs_state['weather_impacts']):
+                    zone_name = bhcs_state['zones'][i]['name']
+                    print(f"  {zone_name}: {impact:+.3f}")
             
         except Exception as e:
             print(f"⚠️ Synchronization error: {e}")
@@ -268,34 +284,57 @@ class FinalCompleteIntegration:
             await self._shutdown_systems()
     
     async def _optimize_system(self):
-        """Optimize the integrated system"""
-        print("⚡ Running System Optimization...")
+        """Optimize integrated system with weather consideration"""
+        print("⚡ Running Weather-Aware System Optimization...")
         
         try:
-            # Get current state
-            bhcs_state = self.mock_engine.get_state()
+            # Get current state with weather data
+            bhcs_state = self.enhanced_engine.get_state()
             
-            # Apply intelligent optimizations
-            for zone in bhcs_state['zones']:
-                if zone['activity'] > 0.7:
-                    # Apply calming effect
-                    self.mock_engine.apply_influence({
-                        'zone_id': zone['id'],
-                        'influence': -0.1
+            # Apply intelligent optimizations based on weather
+            for i, zone in enumerate(bhcs_state['zones']):
+                zone_activity = zone['activity']
+                weather_impact = bhcs_state['weather_impacts'][i]
+                
+                # Consider weather in optimization decisions
+                if zone_activity > 0.7:
+                    # Zone is overstimulated - apply calming effect
+                    # But reduce effectiveness if weather is already calming
+                    if weather_impact < -0.1:
+                        # Weather already calming - use lighter touch
+                        magnitude = -0.05
+                    else:
+                        # Weather not helping - use normal calming
+                        magnitude = -0.1
+                    
+                    self.enhanced_engine.apply_biocore_effect({
+                        'zone_id': i,
+                        'magnitude': magnitude,
+                        'weather_adjusted': True
                     })
                     self.metrics['biocore_effects_applied'] += 1
-                elif zone['activity'] < 0.3:
-                    # Apply activating effect
-                    self.mock_engine.apply_influence({
-                        'zone_id': zone['id'],
-                        'influence': 0.1
+                    
+                elif zone_activity < 0.3:
+                    # Zone is underactive - apply activating effect
+                    # But reduce effectiveness if weather is already activating
+                    if weather_impact > 0.05:
+                        # Weather already activating - use lighter touch
+                        magnitude = 0.05
+                    else:
+                        # Weather not helping - use normal activation
+                        magnitude = 0.1
+                    
+                    self.enhanced_engine.apply_biocore_effect({
+                        'zone_id': i,
+                        'magnitude': magnitude,
+                        'weather_adjusted': True
                     })
                     self.metrics['biocore_effects_applied'] += 1
             
-            print("✅ System Optimization Complete")
+            print("✅ Weather-Aware System Optimization Complete")
             
         except Exception as e:
-            print(f"⚠️ Optimization error: {e}")
+            print(f"⚠️ Weather-Aware Optimization error: {e}")
     
     async def _shutdown_systems(self):
         """Shutdown all systems gracefully"""
@@ -303,8 +342,10 @@ class FinalCompleteIntegration:
         
         # Stop BHCS
         self.system_state['bhcs_active'] = False
-        if self.mock_engine:
-            self.mock_engine.shutdown()
+        if self.enhanced_engine:
+            self.enhanced_engine.shutdown()
+        if self.weather_adapter:
+            self.weather_adapter.stop_integration()
         
         # Stop Luna systems
         self.system_state['luna_active'] = False
@@ -319,6 +360,7 @@ class FinalCompleteIntegration:
         print(f"  AI Predictions: {self.metrics['ai_predictions']}")
         print(f"  Voice Commands: {self.metrics['voice_commands']}")
         print(f"  Final System Health: {self.metrics['system_health']:.3f}")
+        print(f"  Weather Integration: {'ACTIVE' if self.system_state.get('weather_active') else 'INACTIVE'}")
         print("=" * 60)
         print("👋 Complete Integrated System Shutdown Complete")
 

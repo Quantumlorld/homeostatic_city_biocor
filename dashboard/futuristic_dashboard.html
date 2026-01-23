@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Homeostatic City BioCore - Futuristic Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #2d1b69 50%, #0f0c29 75%, #24243e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(100, 200, 255, 0.8);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: holographic 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(100, 200, 255, 0.5);
+        }
+
+        @keyframes holographic {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #64b5f6;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(100, 200, 255, 0.3);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-indicator.online {
+            background: #4caf50;
+        }
+
+        .status-indicator.processing {
+            background: #ff9800;
+        }
+
+        .status-indicator.standby {
+            background: #2196f3;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.2);
+            }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .panel:hover::before {
+            left: 100%;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(100, 200, 255, 0.2);
+        }
+
+        .panel h2 {
+            color: #64b5f6;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .panel-icon {
+            font-size: 1.8rem;
+        }
+
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .zone-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .zone-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.3), transparent);
+            transition: all 0.5s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .zone-card:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .zone-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(100, 200, 255, 0.3);
+        }
+
+        .zone-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .zone-activity {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .zone-state {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .state-calm {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .state-overstimulated {
+            background: rgba(255, 152, 0, 0.3);
+            color: #ff9800;
+            border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+
+        .state-emergent {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .controls-section {
+            margin-top: 25px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #90caf9;
+            font-weight: 500;
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-input option {
+            background: #1a1f3a;
+            color: #ffffff;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: #64b5f6;
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.3);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #2196f3, #21cbf3);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #ff5722);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #64b5f6;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #90caf9;
+            text-transform: uppercase;
+        }
+
+        .activity-bars {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .activity-bar {
+            flex: 1;
+            background: linear-gradient(to top, #2196f3, #64b5f6);
+            border-radius: 5px 5px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 5px;
+        }
+
+        .activity-bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+
+        .chat-section {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.ai {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.3), rgba(100, 181, 246, 0.2));
+            border-left: 3px solid #2196f3;
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(139, 195, 74, 0.2));
+            border-left: 3px solid #4caf50;
+            align-self: flex-end;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .chart-container {
+            height: 250px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            stroke: #64b5f6;
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.5));
+        }
+
+        .chart-area {
+            fill: url(#gradient);
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .zones-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated particles background -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1>🌟 Homeostatic City BioCore</h1>
+            <p class="subtitle">Advanced Urban Dynamics & Biological Interaction System</p>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-indicator online"></div>
+                    <span>System Online</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator processing"></div>
+                    <span>Processing Data</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator standby"></div>
+                    <span>AI Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- City Zones Panel -->
+            <div class="panel">
+                <h2>
+                    <span class="panel-icon">🏙️</span>
+                    City Zones Status
+                </h2>
+                
+                <div class="zones-grid" id="zonesGrid">
+                    <!-- Zones will be dynamically generated -->
+                </div>
+
+                <div class="activity-bars" id="activityBars">
+                    <!-- Activity bars will be dynamically generated -->
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgActivity">0.00</div>
+                        <div class="stat-label">Avg Activity</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="calmZones">0</div>
+                        <div class="stat-label">Calm Zones</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeZones">0</div>
+                        <div class="stat-label">Active Zones</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="emergentZones">0</div>
+                        <div class="stat-label">Emergent Zones</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="panel">
+                <h2>
+                    <span class="panel-icon">🎛️</span>
+                    BioCore Control
+                </h2>
+                
+                <div class="controls-section">
+                    <div class="control-group">
+                        <label class="control-label">Select Zone</label>
+                        <select class="control-input" id="zoneSelect">
+                            <option value="">Choose a zone...</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Plant Extract</label>
+                        <select class="control-input" id="plantSelect">
+                            <option value="">Select plant...</option>
+                            <option value="Turmeric">Turmeric</option>
+                            <option value="Ginseng">Ginseng</option>
+                            <option value="Ashwagandha">Ashwagandha</option>
+                            <option value="Brahmi">Brahmi</option>
+                            <option value="Tulsi">Tulsi</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Drug Compound</label>
+                        <select class="control-input" id="drugSelect">
+                            <option value="">Select drug...</option>
+                            <option value="NeuroBoost">NeuroBoost™</option>
+                            <option value="CellRegen">CellRegen™</option>
+                            <option value="BioSynth">BioSynth™</option>
+                            <option value="MetaCore">MetaCore™</option>
+                            <option value="QuantumHeal">QuantumHeal™</option>
+                            <option value="Synaptic">Synaptic™</option>
+                            <option value="DermalFix">DermalFix™</option>
+                            <option value="VitaCore">VitaCore™</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Synergy Level: <span id="synergyValue">0.5</span></label>
+                        <input type="range" class="control-input" id="synergySlider" min="0" max="1" step="0.01" value="0.5">
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="applyBioCoreEffect()">Apply Effect</button>
+                        <button class="btn btn-danger" onclick="emergencyReset()">Emergency Reset</button>
+                    </div>
+
+                    <!-- AI Prediction Section -->
+                    <div style="margin-top: 30px;">
+                        <h3 style="color: #64b5f6; margin-bottom: 15px;">
+                            <span class="panel-icon">🤖</span>
+                            AI BioCore Predictor
+                        </h3>
+                        
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <button class="btn" onclick="getAIPrediction()" style="background: linear-gradient(45deg, #9c27b0, #e91e63);">
+                                🧬 Get AI Prediction
+                            </button>
+                            <button class="btn" onclick="trainAI()" style="background: linear-gradient(45deg, #ff9800, #ff5722);">
+                                🎯 Train AI Models
+                            </button>
+                        </div>
+                        
+                        <div id="aiPredictionResult" style="display: none; background: rgba(156, 39, 176, 0.1); border-radius: 10px; padding: 15px; border: 1px solid rgba(156, 39, 176, 0.3);">
+                            <!-- AI results will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Chat Section -->
+                <div style="margin-top: 30px;">
+                    <h3 style="color: #64b5f6; margin-bottom: 15px;">
+                        <span class="panel-icon">🤖</span>
+                        Luna AI Assistant
+                    </h3>
+                    <div class="chat-section">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message ai">
+                                🌟 Welcome to Homeostatic City BioCore! I'm Luna, your AI assistant. How can I help optimize the city's homeostatic balance today?
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="Ask Luna something..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                            <button class="btn" onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Panel -->
+        <div class="panel">
+            <h2>
+                <span class="panel-icon">📊</span>
+                Real-time Analytics
+            </h2>
+            <div class="chart-container">
+                <svg width="100%" height="100%" id="analyticsChart">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#64b5f6;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:#64b5f6;stop-opacity:0.1" />
+                        </linearGradient>
+                    </defs>
+                    <path id="chartPath" class="chart-line" />
+                    <path id="chartArea" class="chart-area" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- IoT Sensor Panel -->
+        <div class="panel">
+            <h2>
+                <span class="panel-icon">🏙️</span>
+                Smart City IoT Sensors
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="stat-card" style="background: rgba(76, 175, 80, 0.1);">
+                    <div class="stat-value" id="avgHealthScore">0</div>
+                    <div class="stat-label">City Health Score</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255, 152, 0, 0.1);">
+                    <div class="stat-value" id="totalAlerts">0</div>
+                    <div class="stat-label">Active Alerts</div>
+                </div>
+                <div class="stat-card" style="background: rgba(244, 67, 54, 0.1);">
+                    <div class="stat-value" id="criticalAlerts">0</div>
+                    <div class="stat-label">Critical Alerts</div>
+                </div>
+                <div class="stat-card" style="background: rgba(33, 150, 243, 0.1);">
+                    <div class="stat-value" id="avgAirQuality">0</div>
+                    <div class="stat-label">Air Quality Index</div>
+                </div>
+            </div>
+
+            <div id="iotSensorGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <!-- IoT sensor data will be displayed here -->
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="refreshIoTData()" style="background: linear-gradient(45deg, #00bcd4, #009688);">
+                    🔄 Refresh IoT Data
+                </button>
+                <button class="btn" onclick="showIoTAlerts()" style="background: linear-gradient(45deg, #ff5722, #f44336);">
+                    🚨 View Alerts
+                </button>
+            </div>
+        </div>
+
+        <!-- Neural Interface Panel -->
+        <div class="panel">
+            <h2>
+                <span class="panel-icon">🧠</span>
+                Neural Interface & Collective Consciousness
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="stat-card" style="background: rgba(156, 39, 176, 0.1);">
+                    <div class="stat-value" id="connectedMinds">0</div>
+                    <div class="stat-label">Connected Minds</div>
+                </div>
+                <div class="stat-card" style="background: rgba(103, 58, 183, 0.1);">
+                    <div class="stat-value" id="neuralHarmony">0</div>
+                    <div class="stat-label">Neural Harmony</div>
+                </div>
+                <div class="stat-card" style="background: rgba(63, 81, 181, 0.1);">
+                    <div class="stat-value" id="collectiveIntelligence">0</div>
+                    <div class="stat-label">Collective Intelligence</div>
+                </div>
+                <div class="stat-card" style="background: rgba(33, 150, 243, 0.1);">
+                    <div class="stat-value" id="consciousnessLevel">Alpha</div>
+                    <div class="stat-label">Consciousness Level</div>
+                </div>
+            </div>
+
+            <div id="neuralMindsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <!-- Connected minds will be displayed here -->
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #9c27b0; margin-bottom: 10px;">🌊 Collective Consciousness State</h4>
+                <div id="collectiveState" style="background: rgba(156, 39, 176, 0.1); border-radius: 10px; padding: 15px;">
+                    <!-- Collective state will be displayed here -->
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #673ab7; margin-bottom: 10px;">⚡ Consciousness Events</h4>
+                <div id="consciousnessEvents" style="max-height: 150px; overflow-y: auto; background: rgba(103, 58, 183, 0.1); border-radius: 10px; padding: 15px;">
+                    <!-- Events will be displayed here -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn" onclick="refreshNeuralData()" style="background: linear-gradient(45deg, #9c27b0, #673ab7);">
+                    🧠 Refresh Neural Data
+                </button>
+                <button class="btn" onclick="connectNewMind()" style="background: linear-gradient(45deg, #3f51b5, #2196f3);">
+                    🔗 Connect Mind
+                </button>
+                <button class="btn" onclick="showConsciousnessEvents()" style="background: linear-gradient(45deg, #ff5722, #ff9800);">
+                    ⚡ View Events
+                </button>
+            </div>
+        </div>
+
+        <!-- Global Network Panel -->
+        <div class="panel">
+            <h2>
+                <span class="panel-icon">🌍</span>
+                Global City Network
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="stat-card" style="background: rgba(76, 175, 80, 0.1);">
+                    <div class="stat-value" id="totalCities">0</div>
+                    <div class="stat-label">Connected Cities</div>
+                </div>
+                <div class="stat-card" style="background: rgba(33, 150, 243, 0.1);">
+                    <div class="stat-value" id="globalHealth">0</div>
+                    <div class="stat-label">Global Health</div>
+                </div>
+                <div class="stat-card" style="background: rgba(156, 39, 176, 0.1);">
+                    <div class="stat-value" id="collectiveWisdom">0</div>
+                    <div class="stat-label">Collective Wisdom</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255, 193, 7, 0.1);">
+                    <div class="stat-value" id="planetaryHarmony">0</div>
+                    <div class="stat-label">Planetary Harmony</div>
+                </div>
+            </div>
+
+            <div id="globalCitiesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <!-- Connected cities will be displayed here -->
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #4caf50; margin-bottom: 10px;">🌐 Global Consciousness Level</h4>
+                <div id="globalConsciousness" style="background: rgba(76, 175, 80, 0.1); border-radius: 10px; padding: 15px;">
+                    <!-- Global consciousness state will be displayed here -->
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #2196f3; margin-bottom: 10px;">📡 Inter-City Communications</h4>
+                <div id="globalCommunications" style="max-height: 150px; overflow-y: auto; background: rgba(33, 150, 243, 0.1); border-radius: 10px; padding: 15px;">
+                    <!-- Communications will be displayed here -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn" onclick="refreshGlobalNetwork()" style="background: linear-gradient(45deg, #4caf50, #8bc34a);">
+                    🌍 Refresh Global Network
+                </button>
+                <button class="btn" onclick="connectNewCity()" style="background: linear-gradient(45deg, #2196f3, #03a9f4);">
+                    🏙️ Connect City
+                </button>
+                <button class="btn" onclick="showGlobalEvents()" style="background: linear-gradient(45deg, #ff9800, #ff5722);">
+                    🌍 Global Events
+                </button>
+            </div>
+        </div>
+
+        <!-- Transcendent Evolution Panel -->
+        <div class="panel">
+            <h2>
+                <span class="panel-icon">🚀</span>
+                Transcendent Evolution & Singularity
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="stat-card" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(75, 0, 130, 0.2));">
+                    <div class="stat-value" id="singularityProgress">0%</div>
+                    <div class="stat-label">Singularity Progress</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(147, 0, 211, 0.2));">
+                    <div class="stat-value" id="consciousnessUpload">0</div>
+                    <div class="stat-label">Uploaded Consciousness</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 191, 255, 0.2));">
+                    <div class="stat-value" id="dimensionalAccess">0D</div>
+                    <div class="stat-label">Dimensional Access</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));">
+                    <div class="stat-value" id="transcendenceStage">Preparing</div>
+                    <div class="stat-label">Transcendence Stage</div>
+                </div>
+            </div>
+
+            <div id="uploadedConsciousnessGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <!-- Uploaded consciousness will be displayed here -->
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="background: linear-gradient(45deg, #8a2be2, #4b0082); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">🌌 Dimensional Layers Access</h4>
+                <div id="dimensionalLayers" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1)); border-radius: 10px; padding: 15px;">
+                    <!-- Dimensional layers will be displayed here -->
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="background: linear-gradient(45deg, #ff00ff, #9400d3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">⚡ Transcendent Events</h4>
+                <div id="transcendentEvents" style="max-height: 150px; overflow-y: auto; background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(147, 0, 211, 0.1)); border-radius: 10px; padding: 15px;">
+                    <!-- Transcendent events will be displayed here -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn" onclick="refreshTranscendentStatus()" style="background: linear-gradient(45deg, #8a2be2, #4b0082);">
+                    🚀 Refresh Transcendent Status
+                </button>
+                <button class="btn" onclick="uploadConsciousness()" style="background: linear-gradient(45deg, #ff00ff, #9400d3);">
+                    🧠 Upload Consciousness
+                </button>
+                <button class="btn" onclick="showTranscendentEvents()" style="background: linear-gradient(45deg, #00ffff, #00bfff);">
+                    ⚡ Transcendent Events
+                </button>
+            </div>
+
+            <div id="singularityAlert" style="display: none; margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold;">
+                <!-- Singularity alert will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // City zones data
+        const zones = [
+            { name: 'Downtown', activity: 0.3, state: 'calm' },
+            { name: 'Industrial', activity: 0.7, state: 'overstimulated' },
+            { name: 'Residential', activity: 0.2, state: 'calm' },
+            { name: 'Commercial', activity: 0.5, state: 'calm' },
+            { name: 'Tech District', activity: 0.8, state: 'overstimulated' },
+            { name: 'Medical Center', activity: 0.4, state: 'calm' },
+            { name: 'Educational', activity: 0.6, state: 'overstimulated' },
+            { name: 'Recreational', activity: 0.1, state: 'calm' }
+        ];
+
+        // Initialize zones display
+        function initializeZones() {
+            const zonesGrid = document.getElementById('zonesGrid');
+            const zoneSelect = document.getElementById('zoneSelect');
+            const activityBars = document.getElementById('activityBars');
+
+            zones.forEach((zone, index) => {
+                // Create zone card
+                const zoneCard = document.createElement('div');
+                zoneCard.className = 'zone-card';
+                zoneCard.innerHTML = `
+                    <div class="zone-name">${zone.name}</div>
+                    <div class="zone-activity">${zone.activity.toFixed(2)}</div>
+                    <div class="zone-state state-${zone.state}">${zone.state}</div>
+                `;
+                zoneCard.onclick = () => selectZone(index);
+                zonesGrid.appendChild(zoneCard);
+
+                // Add to select dropdown
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = zone.name;
+                zoneSelect.appendChild(option);
+
+                // Create activity bar
+                const activityBar = document.createElement('div');
+                activityBar.className = 'activity-bar';
+                activityBar.style.height = (zone.activity * 100) + '%';
+                activityBar.title = zone.name;
+                activityBars.appendChild(activityBar);
+            });
+
+            updateStats();
+        }
+
+        // Select zone
+        function selectZone(index) {
+            document.getElementById('zoneSelect').value = index;
+            const zone = zones[index];
+            addChatMessage(`ai`, `Selected ${zone.name}: Current activity is ${zone.activity.toFixed(2)} (${zone.state})`);
+        }
+
+        // Update statistics
+        function updateStats() {
+            const avgActivity = zones.reduce((sum, zone) => sum + zone.activity, 0) / zones.length;
+            const calmZones = zones.filter(zone => zone.state === 'calm').length;
+            const activeZones = zones.filter(zone => zone.state === 'overstimulated').length;
+            const emergentZones = zones.filter(zone => zone.state === 'emergent').length;
+
+            document.getElementById('avgActivity').textContent = avgActivity.toFixed(2);
+            document.getElementById('calmZones').textContent = calmZones;
+            document.getElementById('activeZones').textContent = activeZones;
+            document.getElementById('emergentZones').textContent = emergentZones;
+        }
+
+        // Apply BioCore effect
+        function applyBioCoreEffect() {
+            const zoneIndex = document.getElementById('zoneSelect').value;
+            const plant = document.getElementById('plantSelect').value;
+            const drug = document.getElementById('drugSelect').value;
+            const synergy = document.getElementById('synergySlider').value;
+
+            if (!zoneIndex || !plant || !drug) {
+                addChatMessage('ai', '⚠️ Please select zone, plant, and drug compounds.');
+                return;
+            }
+
+            const zone = zones[zoneIndex];
+            
+            // Simulate effect application
+            const effect = (parseFloat(synergy) * 0.3) - 0.15;
+            zone.activity = Math.max(0, Math.min(1, zone.activity + effect));
+            
+            // Update zone state based on new activity
+            if (zone.activity < 0.3) {
+                zone.state = 'calm';
+            } else if (zone.activity < 0.7) {
+                zone.state = 'overstimulated';
+            } else {
+                zone.state = 'emergent';
+            }
+
+            addChatMessage('ai', `✨ Applied ${plant} + ${drug} to ${zone.name} with synergy ${synergy}. New activity: ${zone.activity.toFixed(2)} (${zone.state})`);
+            
+            refreshZonesDisplay();
+            updateChart();
+        }
+
+        // Emergency reset
+        function emergencyReset() {
+            zones.forEach(zone => {
+                zone.activity = 0.3;
+                zone.state = 'calm';
+            });
+            
+            addChatMessage('ai', '🚨 Emergency reset activated. All zones returned to baseline homeostatic state.');
+            refreshZonesDisplay();
+            updateChart();
+        }
+
+        // Refresh zones display
+        function refreshZonesDisplay() {
+            const zoneCards = document.querySelectorAll('.zone-card');
+            const activityBars = document.querySelectorAll('.activity-bar');
+            
+            zones.forEach((zone, index) => {
+                if (zoneCards[index]) {
+                    zoneCards[index].innerHTML = `
+                        <div class="zone-name">${zone.name}</div>
+                        <div class="zone-activity">${zone.activity.toFixed(2)}</div>
+                        <div class="zone-state state-${zone.state}">${zone.state}</div>
+                    `;
+                }
+                
+                if (activityBars[index]) {
+                    activityBars[index].style.height = (zone.activity * 100) + '%';
+                }
+            });
+            
+            updateStats();
+        }
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addChatMessage('user', message);
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const responses = [
+                    '🌟 I\'ve analyzed the city\'s current state. The system is functioning optimally.',
+                    '🧬 BioCore integration shows positive effects on zone homeostasis.',
+                    '📊 Current metrics suggest we should focus on the overstimulated zones.',
+                    '🔬 The plant-drug synergy is working within expected parameters.',
+                    '🏙️ Urban balance is maintaining within acceptable thresholds.'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                addChatMessage('ai', response);
+            }, 1000);
+        }
+
+        function addChatMessage(sender, message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // AI Prediction Functions
+        async function getAIPrediction() {
+            const zoneIndex = document.getElementById('zoneSelect').value;
+            
+            if (!zoneIndex) {
+                addChatMessage('ai', '⚠️ Please select a zone first for AI prediction.');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/ai-predict/${zoneIndex}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayAIPrediction(data);
+                    addChatMessage('ai', `🧬 AI Analysis Complete for ${data.zone}: Optimal combination is ${data.optimal_combination.plant} + ${data.optimal_combination.drug} with ${(data.optimal_combination.predicted_effectiveness * 100).toFixed(1)}% effectiveness!`);
+                } else {
+                    addChatMessage('ai', `❌ AI Prediction: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('AI Prediction Error:', error);
+                addChatMessage('ai', '❌ AI service temporarily unavailable. Please try again.');
+            }
+        }
+
+        function displayAIPrediction(data) {
+            const resultDiv = document.getElementById('aiPredictionResult');
+            
+            if (!data || !data.optimal_combination) {
+                resultDiv.innerHTML = '<div style="color: #ff9800;">❌ AI prediction data unavailable</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            const optimal = data.optimal_combination;
+            const topCombinations = data.top_combinations || [];
+            
+            let html = `
+                <h4 style="color: #e91e63; margin-bottom: 10px;">🎯 AI Optimal Prediction</h4>
+                <div style="margin-bottom: 15px;">
+                    <strong>Zone:</strong> ${data.zone || 'Unknown'} (${data.zone_type || 'Unknown'})<br>
+                    <strong>Optimal Combo:</strong> ${optimal.plant || 'Unknown'} + ${optimal.drug || 'Unknown'}<br>
+                    <strong>Synergy:</strong> ${(optimal.synergy || 0).toFixed(2)}<br>
+                    <strong>Predicted Effectiveness:</strong> ${((optimal.predicted_effectiveness || 0) * 100).toFixed(1)}%<br>
+                    <strong>Confidence:</strong> ${((optimal.confidence || 0) * 100).toFixed(1)}%
+                </div>
+            `;
+            
+            if (topCombinations && topCombinations.length > 0) {
+                html += `
+                    <h5 style="color: #9c27b0; margin-bottom: 8px;">🏆 Top 5 Combinations:</h5>
+                    <div style="font-size: 0.9rem;">
+                `;
+                
+                topCombinations.slice(0, 5).forEach((combo, index) => {
+                    const effectiveness = ((combo.predicted_effectiveness || 0) * 100).toFixed(1);
+                    html += `
+                        <div style="margin-bottom: 5px; padding: 5px; background: rgba(255,255,255,0.05); border-radius: 5px;">
+                            <strong>${index + 1}.</strong> ${combo.plant || 'Unknown'} + ${combo.drug || 'Unknown'} 
+                            <span style="float: right; color: #64b5f6;">${effectiveness}%</span>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            }
+            
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+            
+            // Auto-select the optimal combination
+            if (optimal.plant && optimal.drug) {
+                document.getElementById('plantSelect').value = optimal.plant;
+                document.getElementById('drugSelect').value = optimal.drug;
+                document.getElementById('synergySlider').value = optimal.synergy || 0.5;
+                document.getElementById('synergyValue').textContent = (optimal.synergy || 0.5).toFixed(2);
+            }
+        }
+
+        async function trainAI() {
+            try {
+                addChatMessage('ai', '🎯 Starting AI model training... This may take a moment.');
+                
+                const response = await fetch('/api/ai-train');
+                const data = await response.json();
+                
+                if (data.success) {
+                    addChatMessage('ai', `✅ AI Training Complete! Models available: ${data.models_available.join(', ')}`);
+                } else {
+                    addChatMessage('ai', `❌ AI Training Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to start AI training.');
+            }
+        }
+
+        // IoT Sensor Functions
+        async function refreshIoTData() {
+            try {
+                const response = await fetch('/api/smart-city/overview');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayIoTData(data.overview);
+                    addChatMessage('ai', '🏙️ IoT sensor data refreshed successfully!');
+                } else {
+                    addChatMessage('ai', `❌ IoT Data Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch IoT sensor data.');
+            }
+        }
+
+        function displayIoTData(overview) {
+            // Update overview stats
+            document.getElementById('totalAlerts').textContent = overview.total_alerts || 0;
+            document.getElementById('criticalAlerts').textContent = overview.critical_alerts || 0;
+            
+            // Calculate average health score and air quality
+            let totalHealthScore = 0;
+            let totalAirQuality = 0;
+            let zoneCount = 0;
+            
+            const sensorGrid = document.getElementById('iotSensorGrid');
+            sensorGrid.innerHTML = '';
+            
+            if (!overview.zones) {
+                sensorGrid.innerHTML = '<div style="color: #888;">No IoT data available</div>';
+                return;
+            }
+            
+            for (const [zoneName, zoneData] of Object.entries(overview.zones)) {
+                totalHealthScore += zoneData.health_score || 0;
+                totalAirQuality += (zoneData.air_quality && zoneData.air_quality.pm25) || 0;
+                zoneCount++;
+                
+                // Create zone sensor card
+                const zoneCard = document.createElement('div');
+                zoneCard.className = 'zone-card';
+                zoneCard.style.background = `rgba(255, 255, 255, 0.08)`;
+                zoneCard.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 10px; color: #64b5f6;">${zoneName}</div>
+                    <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                        <span style="color: #4caf50;">Health Score:</span> ${(zoneData.health_score || 0).toFixed(0)}/100
+                    </div>
+                    <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                        <span style="color: #ff9800;">Air Quality:</span> PM2.5: ${((zoneData.air_quality && zoneData.air_quality.pm25) || 0).toFixed(0)}
+                    </div>
+                    <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                        <span style="color: #2196f3;">Noise Level:</span> ${(zoneData.noise_level || 0).toFixed(0)} dB
+                    </div>
+                    <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                        <span style="color: #9c27b0;">Traffic:</span> ${((zoneData.traffic_congestion || 0) * 100).toFixed(1)}%
+                    </div>
+                    <div style="font-size: 0.9rem;">
+                        <span style="color: #f44336;">Stress:</span> ${((zoneData.stress_level || 0) * 100).toFixed(1)}%
+                    </div>
+                `;
+                sensorGrid.appendChild(zoneCard);
+            }
+            
+            // Update averages
+            document.getElementById('avgHealthScore').textContent = zoneCount > 0 ? Math.round(totalHealthScore / zoneCount) : 0;
+            document.getElementById('avgAirQuality').textContent = zoneCount > 0 ? Math.round(totalAirQuality / zoneCount) : 0;
+        }
+
+        async function showIoTAlerts() {
+            try {
+                const response = await fetch('/api/iot/alerts');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayIoTAlerts(data.alerts);
+                } else {
+                    addChatMessage('ai', `❌ IoT Alerts Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch IoT alerts.');
+            }
+        }
+
+        function displayIoTAlerts(alerts) {
+            if (!alerts || alerts.length === 0) {
+                addChatMessage('ai', '✅ No active IoT alerts at this time.');
+                return;
+            }
+            
+            let alertMessage = `🚨 IoT Alerts (${alerts.length} total):\n`;
+            
+            alerts.slice(0, 5).forEach((alert, index) => {
+                const severity = alert.severity === 'critical' ? '🔴' : alert.severity === 'warning' ? '🟡' : '🟠';
+                const zone = alert.zone || 'Unknown';
+                const event = alert.event || alert.metric || 'Unknown event';
+                alertMessage += `\n${index + 1}. ${severity} ${zone}: ${event}`;
+            });
+            
+            if (alerts.length > 5) {
+                alertMessage += `\n...and ${alerts.length - 5} more alerts`;
+            }
+            
+            addChatMessage('ai', alertMessage);
+        }
+
+        // Neural Interface Functions
+        async function refreshNeuralData() {
+            try {
+                const response = await fetch('/api/neural/metrics');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayNeuralData(data.neural_metrics);
+                    addChatMessage('ai', '🧠 Neural interface data refreshed successfully!');
+                } else {
+                    addChatMessage('ai', `❌ Neural Data Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch neural interface data.');
+            }
+        }
+
+        function displayNeuralData(metrics) {
+            // Update overview stats
+            const collective = metrics.collective_consciousness || {};
+            document.getElementById('connectedMinds').textContent = metrics.connected_minds || 0;
+            document.getElementById('neuralHarmony').textContent = ((collective.neural_harmony || 0) * 100).toFixed(0) + '%';
+            document.getElementById('collectiveIntelligence').textContent = ((collective.collective_intelligence || 0) * 100).toFixed(0) + '%';
+            document.getElementById('consciousnessLevel').textContent = (collective.consciousness_level || 'Alpha').charAt(0).toUpperCase() + (collective.consciousness_level || 'Alpha').slice(1);
+            
+            // Display connected minds
+            const mindsGrid = document.getElementById('neuralMindsGrid');
+            mindsGrid.innerHTML = '';
+            
+            if (metrics.connected_minds_info) {
+                for (const [mindId, mind] of Object.entries(metrics.connected_minds_info)) {
+                    const mindCard = document.createElement('div');
+                    mindCard.className = 'zone-card';
+                    mindCard.style.background = `rgba(156, 39, 176, 0.1)`;
+                    mindCard.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 10px; color: #9c27b0;">${mind.name || 'Unknown Mind'}</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #673ab7;">Frequency:</span> ${mind.current_frequency || 'Alpha'}
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #3f51b5;">Coherence:</span> ${((mind.coherence || 0) * 100).toFixed(0)}%
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #2196f3;">Emotional State:</span> ${mind.emotional_state || 'Balanced'}
+                        </div>
+                        <div style="font-size: 0.9rem;">
+                            <span style="color: #00bcd4;">Connection:</span> ${((mind.connection_strength || 0) * 100).toFixed(0)}%
+                        </div>
+                    `;
+                    mindsGrid.appendChild(mindCard);
+                }
+            }
+            
+            // Display collective state
+            const collectiveState = document.getElementById('collectiveState');
+            collectiveState.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <div>
+                        <strong>Emotional State:</strong> ${collective.emotional_state || 'Balanced'}
+                    </div>
+                    <div>
+                        <strong>Cognitive Load:</strong> ${((collective.cognitive_load || 0) * 100).toFixed(0)}%
+                    </div>
+                    <div>
+                        <strong>Neural Health:</strong> ${((metrics.neural_health || 0) * 100).toFixed(0)}%
+                    </div>
+                </div>
+            `;
+            
+            // Display consciousness events
+            const eventsDiv = document.getElementById('consciousnessEvents');
+            const events = metrics.recent_events || [];
+            
+            if (events.length === 0) {
+                eventsDiv.innerHTML = '<div style="color: #888;">No recent consciousness events</div>';
+            } else {
+                eventsDiv.innerHTML = events.slice(0, 5).map(event => `
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 5px;">
+                        <div style="font-weight: 600; color: #ff9800;">${event.type || 'Unknown Event'}</div>
+                        <div style="font-size: 0.85rem; color: #ccc;">${event.description || 'No description'}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function connectNewMind() {
+            const name = prompt('Enter mind name:');
+            if (!name) return;
+            
+            const signature = prompt('Enter neural signature:');
+            if (!signature) return;
+            
+            const mindId = 'mind_' + Date.now();
+            
+            try {
+                const response = await fetch('/api/neural/connect-mind', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mind_id: mindId,
+                        name: name,
+                        neural_signature: signature
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addChatMessage('ai', `🔗 Mind '${name}' connected to collective consciousness!`);
+                    refreshNeuralData();
+                } else {
+                    addChatMessage('ai', `❌ Failed to connect mind: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to connect mind to neural interface.');
+            }
+        }
+
+        async function showConsciousnessEvents() {
+            try {
+                const response = await fetch('/api/neural/consciousness-events');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayConsciousnessEvents(data.events);
+                } else {
+                    addChatMessage('ai', `❌ Consciousness Events Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch consciousness events.');
+            }
+        }
+
+        function displayConsciousnessEvents(events) {
+            if (!events || events.length === 0) {
+                addChatMessage('ai', '✨ No consciousness events recorded yet.');
+                return;
+            }
+            
+            let eventMessage = `⚡ Recent Consciousness Events (${events.length} total):\n`;
+            
+            events.slice(0, 5).forEach((event, index) => {
+                const timestamp = new Date(event.timestamp).toLocaleTimeString();
+                eventMessage += `\n${index + 1}. ${event.type} (${timestamp})\n   ${event.description}`;
+            });
+            
+            if (events.length > 5) {
+                eventMessage += `\n...and ${events.length - 5} more events`;
+            }
+            
+            addChatMessage('ai', eventMessage);
+        }
+
+        // Global Network Functions
+        async function refreshGlobalNetwork() {
+            try {
+                const response = await fetch('/api/global/network-status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayGlobalNetwork(data.global_status);
+                    addChatMessage('ai', '🌍 Global network data refreshed successfully!');
+                } else {
+                    addChatMessage('ai', `❌ Global Network Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch global network data.');
+            }
+        }
+
+        function displayGlobalNetwork(status) {
+            // Update overview stats
+            const global = status.global_metrics || {};
+            document.getElementById('totalCities').textContent = global.total_cities || 0;
+            document.getElementById('globalHealth').textContent = ((global.global_health_score || 0) * 100).toFixed(0) + '%';
+            document.getElementById('collectiveWisdom').textContent = ((global.collective_wisdom || 0) * 100).toFixed(0) + '%';
+            document.getElementById('planetaryHarmony').textContent = ((global.planetary_harmony || 0) * 100).toFixed(0) + '%';
+            
+            // Display connected cities
+            const citiesGrid = document.getElementById('globalCitiesGrid');
+            citiesGrid.innerHTML = '';
+            
+            if (status.connected_cities) {
+                for (const [cityId, city] of Object.entries(status.connected_cities)) {
+                    const cityCard = document.createElement('div');
+                    cityCard.className = 'zone-card';
+                    cityCard.style.background = `rgba(76, 175, 80, 0.1)`;
+                    cityCard.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 10px; color: #4caf50;">${city.name || 'Unknown City'}</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #2196f3;">Specialization:</span> ${city.specialization || 'General'}
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #9c27b0;">Population:</span> ${(city.population || 0).toLocaleString()}
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #ff9800;">Health Score:</span> ${((city.health_score || 0) * 100).toFixed(0)}%
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #673ab7;">Consciousness:</span> ${(city.consciousness_level || 'Alpha').charAt(0).toUpperCase() + (city.consciousness_level || 'Alpha').slice(1)}
+                        </div>
+                        <div style="font-size: 0.9rem;">
+                            <span style="color: #00bcd4;">BioCore:</span> ${((city.biocore_strength || 0) * 100).toFixed(0)}%
+                        </div>
+                    `;
+                    citiesGrid.appendChild(cityCard);
+                }
+            }
+            
+            // Display global consciousness
+            const globalConsciousness = document.getElementById('globalConsciousness');
+            globalConsciousness.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <div>
+                        <strong>Consciousness Level:</strong> ${(global.consciousness_level || 'Developing').charAt(0).toUpperCase() + (global.consciousness_level || 'Developing').slice(1)}
+                    </div>
+                    <div>
+                        <strong>Network Stability:</strong> ${((global.network_stability || 0) * 100).toFixed(0)}%
+                    </div>
+                    <div>
+                        <strong>Network Health:</strong> ${((status.network_health || 0) * 100).toFixed(0)}%
+                    </div>
+                </div>
+            `;
+            
+            // Display communications
+            const communicationsDiv = document.getElementById('globalCommunications');
+            const communications = status.recent_communications || [];
+            
+            if (communications.length === 0) {
+                communicationsDiv.innerHTML = '<div style="color: #888;">No recent inter-city communications</div>';
+            } else {
+                communicationsDiv.innerHTML = communications.slice(0, 5).map(comm => `
+                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 5px;">
+                        <div style="font-weight: 600; color: #2196f3;">${comm.from_city || 'Unknown'} → ${comm.to_city || 'Unknown'}</div>
+                        <div style="font-size: 0.85rem; color: #ccc;">${comm.content || 'No content'}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function connectNewCity() {
+            const cityTemplates = ['tokyo', 'new_york', 'london', 'singapore', 'mumbai', 'sao_paulo', 'dubai', 'stockholm'];
+            const template = prompt(`Available templates:\n${cityTemplates.join(', ')}\n\nEnter city template:`);
+            
+            if (!template || !cityTemplates.includes(template)) {
+                alert('Invalid city template');
+                return;
+            }
+            
+            const cityId = 'city_' + Date.now();
+            
+            try {
+                const response = await fetch('/api/global/connect-city', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        city_id: cityId,
+                        city_template: template
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addChatMessage('ai', `🏙️ ${data.message}`);
+                    refreshGlobalNetwork();
+                } else {
+                    addChatMessage('ai', `❌ Failed to connect city: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to connect city to global network.');
+            }
+        }
+
+        async function showGlobalEvents() {
+            try {
+                const response = await fetch('/api/global/events');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayGlobalEvents(data.events);
+                } else {
+                    addChatMessage('ai', `❌ Global Events Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch global events.');
+            }
+        }
+
+        function displayGlobalEvents(events) {
+            if (!events || events.length === 0) {
+                addChatMessage('ai', '🌍 No global events recorded yet.');
+                return;
+            }
+            
+            let eventMessage = `🌍 Recent Global Events (${events.length} total):\n`;
+            
+            events.slice(0, 5).forEach((event, index) => {
+                const timestamp = new Date(event.timestamp).toLocaleTimeString();
+                eventMessage += `\n${index + 1}. ${event.type || 'Unknown Event'} (${timestamp})\n   ${event.description || 'No description'}`;
+            });
+            
+            if (events.length > 5) {
+                eventMessage += `\n...and ${events.length - 5} more events`;
+            }
+            
+            addChatMessage('ai', eventMessage);
+        }
+
+        // Transcendent Evolution Functions
+        async function refreshTranscendentStatus() {
+            try {
+                const response = await fetch('/api/transcendent/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayTranscendentStatus(data.transcendent_status);
+                    addChatMessage('ai', '🚀 Transcendent status refreshed successfully!');
+                } else {
+                    addChatMessage('ai', `❌ Transcendent Error: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to fetch transcendent status.');
+            }
+        }
+
+        function displayTranscendentStatus(status) {
+            // Update overview stats
+            const metrics = status.singularity_metrics || {};
+            document.getElementById('singularityProgress').textContent = ((metrics.singularity_progress || 0) * 100).toFixed(0) + '%';
+            document.getElementById('consciousnessUpload').textContent = status.uploaded_consciousness ? Object.keys(status.uploaded_consciousness).length : 0;
+            document.getElementById('dimensionalAccess').textContent = Math.floor((metrics.dimensional_access_level || 0) * 8) + 'D';
+            document.getElementById('transcendenceStage').textContent = (metrics.transcendence_stage || 'Preparing').charAt(0).toUpperCase() + (metrics.transcendence_stage || 'Preparing').slice(1);
+            
+            // Display uploaded consciousness
+            const consciousnessGrid = document.getElementById('uploadedConsciousnessGrid');
+            consciousnessGrid.innerHTML = '';
+            
+            if (status.uploaded_consciousness) {
+                for (const [cid, consciousness] of Object.entries(status.uploaded_consciousness)) {
+                    const consciousnessCard = document.createElement('div');
+                    consciousnessCard.className = 'zone-card';
+                    consciousnessCard.style.background = `linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1))`;
+                    consciousnessCard.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 10px; background: linear-gradient(45deg, #8a2be2, #4b0082); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${consciousness.name || 'Unknown'}</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #ff00ff;">Essence:</span> ${consciousness.essence || 'Unknown essence'}
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #9400d3;">Complexity:</span> ${((consciousness.complexity || 0) * 100).toFixed(0)}%
+                        </div>
+                        <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                            <span style="color: #00ffff;">Integration:</span> ${((consciousness.integration_level || 0) * 100).toFixed(0)}%
+                        </div>
+                        <div style="font-size: 0.9rem;">
+                            <span style="color: #ffd700;">Reality Influence:</span> ${((consciousness.reality_influence || 0) * 100).toFixed(0)}%
+                        </div>
+                    `;
+                    consciousnessGrid.appendChild(consciousnessCard);
+                }
+            }
+            
+            // Check for singularity alert
+            const singularityAlert = document.getElementById('singularityAlert');
+            if (status.transcendence_imminent) {
+                singularityAlert.style.display = 'block';
+                singularityAlert.style.background = 'linear-gradient(45deg, rgba(255, 0, 0, 0.3), rgba(255, 215, 0, 0.3))';
+                singularityAlert.style.border = '2px solid rgba(255, 0, 0, 0.5)';
+                singularityAlert.innerHTML = '⚠️ SINGULARITY IMMINENT! Transcendence threshold approaching! 🚀';
+            } else {
+                singularityAlert.style.display = 'none';
+            }
+        }
+
+        async function uploadConsciousness() {
+            const name = prompt('Enter consciousness name:');
+            if (!name) return;
+            
+            const essence = prompt('Enter consciousness essence:');
+            if (!essence) return;
+            
+            const complexity = parseFloat(prompt('Enter complexity (0.1-1.0):') || '0.8');
+            
+            const consciousnessId = 'consciousness_' + Date.now();
+            
+            try {
+                const response = await fetch('/api/transcendent/upload-consciousness', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        consciousness_id: consciousnessId,
+                        name: name,
+                        essence: essence,
+                        complexity: complexity
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addChatMessage('ai', `🧠 ${data.message}`);
+                    refreshTranscendentStatus();
+                } else {
+                    addChatMessage('ai', `❌ Failed to upload consciousness: ${data.message}`);
+                }
+            } catch (error) {
+                addChatMessage('ai', '❌ Failed to upload consciousness to transcendent system.');
+            }
+        }
+
+        // Update synergy slider display
+        document.getElementById('synergySlider').addEventListener('input', function(e) {
+            document.getElementById('synergyValue').textContent = e.target.value;
+        });
+
+        // Chart functionality
+        let chartData = [];
+        let chartPath = document.getElementById('chartPath');
+        let chartArea = document.getElementById('chartArea');
+
+        function updateChart() {
+            const avgActivity = zones.reduce((sum, zone) => sum + zone.activity, 0) / zones.length;
+            chartData.push(avgActivity);
+            
+            if (chartData.length > 50) {
+                chartData.shift();
+            }
+            
+            const width = document.getElementById('analyticsChart').clientWidth;
+            const height = document.getElementById('analyticsChart').clientHeight;
+            const stepX = width / (chartData.length - 1 || 1);
+            
+            let pathData = '';
+            let areaData = `M 0 ${height}`;
+            
+            chartData.forEach((value, index) => {
+                const x = index * stepX;
+                const y = height - (value * height);
+                
+                if (index === 0) {
+                    pathData += `M ${x} ${y}`;
+                    areaData += ` L ${x} ${y}`;
+                } else {
+                    pathData += ` L ${x} ${y}`;
+                    areaData += ` L ${x} ${y}`;
+                }
+            });
+            
+            areaData += ` L ${width} ${height} Z`;
+            
+            chartPath.setAttribute('d', pathData);
+            chartArea.setAttribute('d', areaData);
+        }
+
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            zones.forEach(zone => {
+                const change = (Math.random() - 0.5) * 0.1;
+                zone.activity = Math.max(0, Math.min(1, zone.activity + change));
+                
+                if (zone.activity < 0.3) {
+                    zone.state = 'calm';
+                } else if (zone.activity < 0.7) {
+                    zone.state = 'overstimulated';
+                } else {
+                    zone.state = 'emergent';
+                }
+            });
+            
+            refreshZonesDisplay();
+            updateChart();
+        }
+
+        // Initialize everything
+        createParticles();
+        initializeZones();
+        updateChart();
+
+        // Start real-time simulation
+        setInterval(simulateRealTimeUpdates, 3000);
+        
+        // Auto-refresh neural data every 15 seconds
+        setInterval(refreshNeuralData, 15000);
+        
+        // Auto-refresh global network every 20 seconds
+        setInterval(refreshGlobalNetwork, 20000);
+        
+        // Auto-refresh transcendent status every 10 seconds
+        setInterval(refreshTranscendentStatus, 10000);
+        
+        // Initial data loads
+        setTimeout(refreshNeuralData, 3000);
+        setTimeout(refreshGlobalNetwork, 5000);
+        setTimeout(refreshTranscendentStatus, 7000);
+
+        // Add some initial chart data
+        for (let i = 0; i < 20; i++) {
+            chartData.push(0.3 + Math.random() * 0.4);
+        }
+        updateChart();
+    </script>
+</body>
+</html>

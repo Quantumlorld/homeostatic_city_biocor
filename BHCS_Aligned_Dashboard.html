@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦀 BHCS Aligned Dashboard - Homeostatic City System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2d3748 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4299e1, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            color: #a0aec0;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: rgba(66, 153, 225, 0.1);
+            border: 1px solid rgba(66, 153, 225, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4299e1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* System Overview */
+        .system-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: rgba(45, 55, 72, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4299e1, #667eea);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(66, 153, 225, 0.4);
+        }
+
+        .metric-label {
+            color: #a0aec0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 8px;
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change-positive { color: #48bb78; }
+        .change-negative { color: #f56565; }
+        .change-neutral { color: #a0aec0; }
+
+        /* Zones Grid */
+        .zones-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .zone-card {
+            background: rgba(45, 55, 72, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .zone-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .zone-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .zone-state {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .state-calm {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .state-overstimulated {
+            background: rgba(237, 137, 54, 0.2);
+            color: #ed8936;
+            border: 1px solid rgba(237, 137, 54, 0.3);
+        }
+
+        .state-emergent {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .state-critical {
+            background: rgba(159, 122, 234, 0.2);
+            color: #9f7aea;
+            border: 1px solid rgba(159, 122, 234, 0.3);
+        }
+
+        .zone-activity {
+            margin: 16px 0;
+        }
+
+        .activity-bar {
+            height: 8px;
+            background: rgba(66, 153, 225, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .activity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4299e1, #667eea);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .zone-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            font-size: 0.875rem;
+            color: #a0aec0;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(45, 55, 72, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            color: #a0aec0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .control-input {
+            padding: 10px 12px;
+            background: rgba(26, 32, 44, 0.8);
+            border: 1px solid rgba(66, 153, 225, 0.3);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4299e1, #667eea);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(66, 153, 225, 0.1);
+            color: #4299e1;
+            border: 1px solid rgba(66, 153, 225, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Activity Log */
+        .activity-log {
+            background: rgba(45, 55, 72, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(26, 32, 44, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid #4299e1;
+            font-size: 0.875rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-time {
+            color: #a0aec0;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+        }
+
+        .log-message {
+            color: #e2e8f0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 12px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .system-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .zones-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🦀 BHCS Aligned</h1>
+            <div class="subtitle">Homeostatic City BioCore System</div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+        </header>
+
+        <!-- System Overview -->
+        <section class="system-overview">
+            <div class="metric-card">
+                <div class="metric-label">System Health</div>
+                <div class="metric-value" id="systemHealth">92.4%</div>
+                <div class="metric-change change-positive">
+                    <span>↑</span> 2.1%
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Average Activity</div>
+                <div class="metric-value" id="avgActivity">0.46</div>
+                <div class="metric-change change-neutral">
+                    <span>→</span> Target: 0.50
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Recovery Confidence</div>
+                <div class="metric-value" id="recoveryConfidence">87%</div>
+                <div class="metric-change change-positive">
+                    <span>↑</span> 5%
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Homeostatic Regulations</div>
+                <div class="metric-value" id="regulations">1,247</div>
+                <div class="metric-change change-positive">
+                    <span>↑</span> Active
+                </div>
+            </div>
+        </section>
+
+        <!-- Zones Section -->
+        <section class="zones-section">
+            <div class="section-header">
+                <h2 class="section-title">🌆 Zone Status</h2>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Live Monitoring</span>
+                </div>
+            </div>
+            
+            <div class="zones-grid" id="zonesGrid">
+                <!-- Zones will be populated here -->
+            </div>
+        </section>
+
+        <!-- Control Panel -->
+        <section class="control-panel">
+            <div class="section-header">
+                <h2 class="section-title">🎛️ Human Control Interface</h2>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Approval Required</span>
+                </div>
+            </div>
+            
+            <div class="control-grid">
+                <div class="control-group">
+                    <label class="control-label">Target Zone</label>
+                    <select class="control-input" id="zoneSelect">
+                        <option value="0">Downtown</option>
+                        <option value="1">Industrial</option>
+                        <option value="2">Residential</option>
+                        <option value="3">Commercial</option>
+                        <option value="4">Tech Park</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Intervention Magnitude</label>
+                    <input type="range" class="control-input" id="magnitudeSlider" 
+                           min="-0.2" max="0.2" step="0.01" value="0">
+                    <div style="text-align: center; margin-top: 4px; color: #a0aec0;">
+                        <span id="magnitudeValue">0.00</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Synergy Modifier</label>
+                    <input type="range" class="control-input" id="synergySlider" 
+                           min="0.0" max="1.0" step="0.1" value="0.5">
+                    <div style="text-align: center; margin-top: 4px; color: #a0aec0;">
+                        <span id="synergyValue">0.5</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">&nbsp;</label>
+                    <button class="btn btn-primary" onclick="requestIntervention()">
+                        🎛️ Request Intervention
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activity Log -->
+        <section class="activity-log">
+            <div class="section-header">
+                <h2 class="section-title">📋 System Activity Log</h2>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Live</span>
+                </div>
+            </div>
+            
+            <div id="activityLog">
+                <!-- Log entries will be populated here -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // BHCS Aligned Dashboard JavaScript
+        class BHCSAlignedDashboard {
+            constructor() {
+                this.zones = [];
+                this.systemMetrics = {
+                    health: 0.924,
+                    avgActivity: 0.46,
+                    recoveryConfidence: 0.87,
+                    regulations: 1247
+                };
+                this.activityLog = [];
+                
+                this.initializeDashboard();
+                this.startRealTimeUpdates();
+            }
+            
+            initializeDashboard() {
+                console.log('🦀 Initializing BHCS Aligned Dashboard');
+                
+                // Initialize zones
+                this.initializeZones();
+                
+                // Setup event listeners
+                this.setupEventListeners();
+                
+                // Add initial log entries
+                this.addLogEntry('System initialized', 'BHCS Core Engine started with homeostatic regulation');
+                this.addLogEntry('Philosophy maintained', 'Core homeostatic principles active');
+                
+                console.log('✅ BHCS Aligned Dashboard ready');
+            }
+            
+            initializeZones() {
+                this.zones = [
+                    { id: 0, name: 'Downtown', activity: 0.42, state: 'CALM', target: 0.5 },
+                    { id: 1, name: 'Industrial', activity: 0.54, state: 'OVERSTIMULATED', target: 0.5 },
+                    { id: 2, name: 'Residential', activity: 0.41, state: 'CALM', target: 0.5 },
+                    { id: 3, name: 'Commercial', activity: 0.48, state: 'OVERSTIMULATED', target: 0.5 },
+                    { id: 4, name: 'Tech Park', activity: 0.45, state: 'CALM', target: 0.5 }
+                ];
+                
+                this.renderZones();
+            }
+            
+            renderZones() {
+                const zonesGrid = document.getElementById('zonesGrid');
+                zonesGrid.innerHTML = '';
+                
+                this.zones.forEach(zone => {
+                    const zoneCard = document.createElement('div');
+                    zoneCard.className = 'zone-card';
+                    zoneCard.innerHTML = `
+                        <div class="zone-header">
+                            <div class="zone-name">${zone.name}</div>
+                            <div class="zone-state state-${zone.state.toLowerCase()}">${zone.state}</div>
+                        </div>
+                        <div class="zone-activity">
+                            <div class="activity-bar">
+                                <div class="activity-fill" style="width: ${zone.activity * 100}%"></div>
+                            </div>
+                        </div>
+                        <div class="zone-metrics">
+                            <span>Activity: ${zone.activity.toFixed(3)}</span>
+                            <span>Target: ${zone.target.toFixed(2)}</span>
+                            <span>Balance Error: ${(zone.target - zone.activity).toFixed(3)}</span>
+                        </div>
+                    `;
+                    zonesGrid.appendChild(zoneCard);
+                });
+            }
+            
+            setupEventListeners() {
+                // Magnitude slider
+                const magnitudeSlider = document.getElementById('magnitudeSlider');
+                const magnitudeValue = document.getElementById('magnitudeValue');
+                magnitudeSlider.addEventListener('input', (e) => {
+                    magnitudeValue.textContent = parseFloat(e.target.value).toFixed(2);
+                });
+                
+                // Synergy slider
+                const synergySlider = document.getElementById('synergySlider');
+                const synergyValue = document.getElementById('synergyValue');
+                synergySlider.addEventListener('input', (e) => {
+                    synergyValue.textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+            
+            startRealTimeUpdates() {
+                // Update system metrics
+                setInterval(() => {
+                    this.updateSystemMetrics();
+                    this.simulateZoneChanges();
+                }, 2000);
+                
+                // Update activity log
+                setInterval(() => {
+                    this.addRandomLogEntry();
+                }, 8000);
+            }
+            
+            updateSystemMetrics() {
+                // Simulate metric changes
+                this.systemMetrics.health += (Math.random() - 0.5) * 0.02;
+                this.systemMetrics.health = Math.max(0, Math.min(1, this.systemMetrics.health));
+                
+                this.systemMetrics.avgActivity += (Math.random() - 0.5) * 0.01;
+                this.systemMetrics.avgActivity = Math.max(0, Math.min(1, this.systemMetrics.avgActivity));
+                
+                this.systemMetrics.recoveryConfidence += (Math.random() - 0.5) * 0.01;
+                this.systemMetrics.recoveryConfidence = Math.max(0, Math.min(1, this.systemMetrics.recoveryConfidence));
+                
+                this.systemMetrics.regulations += Math.floor(Math.random() * 3);
+                
+                // Update UI
+                document.getElementById('systemHealth').textContent = `${(this.systemMetrics.health * 100).toFixed(1)}%`;
+                document.getElementById('avgActivity').textContent = this.systemMetrics.avgActivity.toFixed(2);
+                document.getElementById('recoveryConfidence').textContent = `${(this.systemMetrics.recoveryConfidence * 100).toFixed(0)}%`;
+                document.getElementById('regulations').textContent = this.systemMetrics.regulations.toLocaleString();
+            }
+            
+            simulateZoneChanges() {
+                this.zones.forEach(zone => {
+                    // Simulate homeostatic regulation
+                    const balanceError = zone.target - zone.activity;
+                    const adjustment = 0.03 * balanceError;
+                    const decay = zone.activity > zone.target ? -0.01 : 0;
+                    
+                    zone.activity += adjustment + decay;
+                    zone.activity = Math.max(0, Math.min(1, zone.activity));
+                    
+                    // Update state
+                    if (zone.activity < 0.3) zone.state = 'CALM';
+                    else if (zone.activity < 0.6) zone.state = 'OVERSTIMULATED';
+                    else if (zone.activity < 0.8) zone.state = 'EMERGENT';
+                    else zone.state = 'CRITICAL';
+                });
+                
+                this.renderZones();
+            }
+            
+            requestIntervention() {
+                const zoneId = parseInt(document.getElementById('zoneSelect').value);
+                const magnitude = parseFloat(document.getElementById('magnitudeSlider').value);
+                const synergy = parseFloat(document.getElementById('synergySlider').value);
+                
+                this.addLogEntry('Human Intervention Requested', 
+                    `Zone ${zoneId}: Magnitude ${magnitude.toFixed(3)}, Synergy ${synergy.toFixed(1)}`);
+                
+                // Simulate intervention approval
+                setTimeout(() => {
+                    this.applyIntervention(zoneId, magnitude, synergy);
+                }, 1000);
+            }
+            
+            applyIntervention(zoneId, magnitude, synergy) {
+                const zone = this.zones[zoneId];
+                if (zone) {
+                    const finalMagnitude = magnitude * (0.5 + 0.5 * synergy);
+                    zone.activity += finalMagnitude;
+                    zone.activity = Math.max(0, Math.min(1, zone.activity));
+                    
+                    this.addLogEntry('Intervention Applied', 
+                        `${zone.name}: Applied ${finalMagnitude.toFixed(3)} adjustment`);
+                    
+                    this.renderZones();
+                }
+            }
+            
+            addLogEntry(title, message) {
+                const logContainer = document.getElementById('activityLog');
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                
+                const timestamp = new Date().toLocaleTimeString();
+                logEntry.innerHTML = `
+                    <div class="log-time">${timestamp}</div>
+                    <div class="log-message">
+                        <strong>${title}:</strong> ${message}
+                    </div>
+                `;
+                
+                logContainer.insertBefore(logEntry, logContainer.firstChild);
+                
+                // Keep only last 10 entries
+                while (logContainer.children.length > 10) {
+                    logContainer.removeChild(logContainer.lastChild);
+                }
+            }
+            
+            addRandomLogEntry() {
+                const messages = [
+                    { title: 'Homeostatic Regulation', message: 'System maintaining balance' },
+                    { title: 'Zone Analysis', message: 'All zones within acceptable parameters' },
+                    { title: 'Recovery Update', message: 'System confidence increasing' },
+                    { title: 'Environmental Check', message: 'Weather conditions stable' },
+                    { title: 'System Optimization', message: 'Learning rate adjusted for stability' }
+                ];
+                
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                this.addLogEntry(randomMessage.title, randomMessage.message);
+            }
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            new BHCSAlignedDashboard();
+        });
+    </script>
+</body>
+</html>
