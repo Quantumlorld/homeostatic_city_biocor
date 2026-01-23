@@ -1294,13 +1294,14 @@
                 const response = await fetch('/api/neural/metrics');
                 const data = await response.json();
                 
-                if (data.success) {
+                if (data.success && data.neural_metrics) {
                     displayNeuralData(data.neural_metrics);
                     addChatMessage('ai', '🧠 Neural interface data refreshed successfully!');
                 } else {
-                    addChatMessage('ai', `❌ Neural Data Error: ${data.message}`);
+                    addChatMessage('ai', `❌ Neural Data Error: ${data.message || 'Unknown error'}`);
                 }
             } catch (error) {
+                console.error('Neural Data Error:', error);
                 addChatMessage('ai', '❌ Failed to fetch neural interface data.');
             }
         }
@@ -1317,8 +1318,10 @@
             const mindsGrid = document.getElementById('neuralMindsGrid');
             mindsGrid.innerHTML = '';
             
-            if (metrics.connected_minds_info) {
-                for (const [mindId, mind] of Object.entries(metrics.connected_minds_info)) {
+            const minds = metrics.connected_minds_info || metrics.connected_minds || {};
+            
+            if (Object.keys(minds).length > 0) {
+                for (const [mindId, mind] of Object.entries(minds)) {
                     const mindCard = document.createElement('div');
                     mindCard.className = 'zone-card';
                     mindCard.style.background = `rgba(156, 39, 176, 0.1)`;
@@ -1339,6 +1342,8 @@
                     `;
                     mindsGrid.appendChild(mindCard);
                 }
+            } else {
+                mindsGrid.innerHTML = '<div style="color: #888;">No connected minds available</div>';
             }
             
             // Display collective state
@@ -1449,13 +1454,14 @@
                 const response = await fetch('/api/global/network-status');
                 const data = await response.json();
                 
-                if (data.success) {
+                if (data.success && data.global_status) {
                     displayGlobalNetwork(data.global_status);
                     addChatMessage('ai', '🌍 Global network data refreshed successfully!');
                 } else {
-                    addChatMessage('ai', `❌ Global Network Error: ${data.message}`);
+                    addChatMessage('ai', `❌ Global Network Error: ${data.message || 'Unknown error'}`);
                 }
             } catch (error) {
+                console.error('Global Network Error:', error);
                 addChatMessage('ai', '❌ Failed to fetch global network data.');
             }
         }
@@ -1472,8 +1478,10 @@
             const citiesGrid = document.getElementById('globalCitiesGrid');
             citiesGrid.innerHTML = '';
             
-            if (status.connected_cities) {
-                for (const [cityId, city] of Object.entries(status.connected_cities)) {
+            const cities = status.connected_cities || {};
+            
+            if (Object.keys(cities).length > 0) {
+                for (const [cityId, city] of Object.entries(cities)) {
                     const cityCard = document.createElement('div');
                     cityCard.className = 'zone-card';
                     cityCard.style.background = `rgba(76, 175, 80, 0.1)`;
@@ -1497,6 +1505,8 @@
                     `;
                     citiesGrid.appendChild(cityCard);
                 }
+            } else {
+                citiesGrid.innerHTML = '<div style="color: #888;">No connected cities available</div>';
             }
             
             // Display global consciousness
@@ -1608,13 +1618,14 @@
                 const response = await fetch('/api/transcendent/status');
                 const data = await response.json();
                 
-                if (data.success) {
+                if (data.success && data.transcendent_status) {
                     displayTranscendentStatus(data.transcendent_status);
                     addChatMessage('ai', '🚀 Transcendent status refreshed successfully!');
                 } else {
-                    addChatMessage('ai', `❌ Transcendent Error: ${data.message}`);
+                    addChatMessage('ai', `❌ Transcendent Error: ${data.message || 'Unknown error'}`);
                 }
             } catch (error) {
+                console.error('Transcendent Error:', error);
                 addChatMessage('ai', '❌ Failed to fetch transcendent status.');
             }
         }
@@ -1631,28 +1642,32 @@
             const consciousnessGrid = document.getElementById('uploadedConsciousnessGrid');
             consciousnessGrid.innerHTML = '';
             
-            if (status.uploaded_consciousness) {
-                for (const [cid, consciousness] of Object.entries(status.uploaded_consciousness)) {
+            const consciousness = status.uploaded_consciousness || {};
+            
+            if (Object.keys(consciousness).length > 0) {
+                for (const [cid, fragment] of Object.entries(consciousness)) {
                     const consciousnessCard = document.createElement('div');
                     consciousnessCard.className = 'zone-card';
                     consciousnessCard.style.background = `linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1))`;
                     consciousnessCard.innerHTML = `
-                        <div style="font-weight: 600; margin-bottom: 10px; background: linear-gradient(45deg, #8a2be2, #4b0082); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${consciousness.name || 'Unknown'}</div>
+                        <div style="font-weight: 600; margin-bottom: 10px; background: linear-gradient(45deg, #8a2be2, #4b0082); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${fragment.name || 'Unknown'}</div>
                         <div style="font-size: 0.9rem; margin-bottom: 5px;">
-                            <span style="color: #ff00ff;">Essence:</span> ${consciousness.essence || 'Unknown essence'}
+                            <span style="color: #ff00ff;">Essence:</span> ${fragment.essence || 'Unknown essence'}
                         </div>
                         <div style="font-size: 0.9rem; margin-bottom: 5px;">
-                            <span style="color: #9400d3;">Complexity:</span> ${((consciousness.complexity || 0) * 100).toFixed(0)}%
+                            <span style="color: #9400d3;">Complexity:</span> ${((fragment.complexity || 0) * 100).toFixed(0)}%
                         </div>
                         <div style="font-size: 0.9rem; margin-bottom: 5px;">
-                            <span style="color: #00ffff;">Integration:</span> ${((consciousness.integration_level || 0) * 100).toFixed(0)}%
+                            <span style="color: #00ffff;">Integration:</span> ${((fragment.integration_level || 0) * 100).toFixed(0)}%
                         </div>
                         <div style="font-size: 0.9rem;">
-                            <span style="color: #ffd700;">Reality Influence:</span> ${((consciousness.reality_influence || 0) * 100).toFixed(0)}%
+                            <span style="color: #ffd700;">Reality Influence:</span> ${((fragment.reality_influence || 0) * 100).toFixed(0)}%
                         </div>
                     `;
                     consciousnessGrid.appendChild(consciousnessCard);
                 }
+            } else {
+                consciousnessGrid.innerHTML = '<div style="color: #888;">No uploaded consciousness available</div>';
             }
             
             // Check for singularity alert

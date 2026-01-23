@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install fastapi uvicorn websockets pydantic aiofiles python-multipart
+    
+    - name: Create static demo
+      run: |
+        # Create a static version for GitHub Pages
+        mkdir -p dist
+        cp index.html dist/
+        cp -r dashboard dist/
+        cp -r lunabeyond-ai dist/
+        
+        # Create a simple demo server script
+        cat > dist/demo_info.json << EOF
+        {
+          "title": "Homeostatic City BioCore",
+          "version": "1.0.0",
+          "description": "Transcendent Urban Biocore System",
+          "features": [
+            "AI BioCore Prediction",
+            "Smart City IoT Network", 
+            "Neural Interface",
+            "Global City Network",
+            "Transcendent Evolution"
+          ],
+          "live_demo": "For full functionality, run locally with: python simple_server.py"
+        }
+        EOF
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
